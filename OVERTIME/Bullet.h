@@ -3,16 +3,16 @@
 
 namespace EngineL
 {
-    class Bullet : public Entity
-    {
-    public:
-        Bullet(float x, float y, float directionX, float directionY);
+	class Bullet : public Entity
+	{
+	public:
+		Bullet(float x, float y, float directionX, float directionY);
 
-        void update(float deltaTime) override;
+		void update(float deltaTime) override;
 
-    private:
-        float directionX;
-        float directionY;
-        float speed = 600.f;
-    };
+	private:
+		float directionX;
+		float directionY;
+		float speed = 600.f;
+	};
 }

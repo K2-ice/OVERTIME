@@ -3,15 +3,15 @@
 
 namespace EngineL
 {
-    Bullet::Bullet(float x, float y, float directionX, float directionY)
-        : Entity(x, y, 8.f, 8.f, sf::Color::Yellow, 1)
-    {
-        this->directionX = directionX;
-        this->directionY = directionY;
-    }
+	Bullet::Bullet(float x, float y, float directionX, float directionY)
+		: Entity(x, y, 8.f, 8.f, sf::Color::Yellow)
+	{
+		this->directionX = directionX;
+		this->directionY = directionY;
+	}
 
-    void Bullet::update(float deltaTime)
-    {
-        move(directionX * speed * deltaTime, directionY * speed * deltaTime);
-    }
+	void Bullet::update(float deltaTime)
+	{
+		move(directionX * speed * deltaTime, directionY * speed * deltaTime);
+	}
 }

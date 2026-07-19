@@ -5,14 +5,14 @@
 
 namespace EngineL
 {
-    class RenderManager
-    {
-    public:
-        void add(GameObject* object);
-        void renderAll(Renderer& renderer);
-        void remove(GameObject* object);
+	class RenderManager
+	{
+	public:
+		void add(GameObject* object);
+		void renderAll(Renderer& renderer);
+		void remove(GameObject* object);
 
-    private:
-        std::vector<GameObject*> objects;
-    };
+	private:
+		std::vector<GameObject*> objects;
+	};
 }

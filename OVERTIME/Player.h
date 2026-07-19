@@ -1,32 +1,42 @@
 #pragma once
+
 #include "Entity.h"
 #include "InputManager.h"
 
 namespace EngineL
 {
-    class Player : public Entity
-    {
-    public:
-        Player(float x, float y, InputManager* inputManager);
+	class Player : public Entity
+	{
+	public:
+		Player(float x, float y, InputManager* inputManager);
 
-        void update(float deltaTime) override;
+		void update(float deltaTime) override;
 
-        void aimAt(float mouseX, float mouseY);
+		void aimAt(float mouseX, float mouseY);
 
-        bool wantsToShoot() const;
-        void resetShootCooldown();
+		bool wantsToShoot() const;
+		void resetShootCooldown();
 
-        float getShootDirectionX() const;
-        float getShootDirectionY() const;
+		float getShootDirectionX() const;
+		float getShootDirectionY() const;
 
-    private:
-        InputManager* inputManager;
-        float speed = 200.f;
+		int getSouls() const;
+		void addSouls(int amount);
+		bool spendSouls(int amount);
+		bool canTakeDamage() const;
+		void resetDamageCooldown();
 
-        float shootDirectionX;
-        float shootDirectionY;
+	private:
+		InputManager* inputManager;
 
-        float shootCooldown = 0.f;
-        float shootCooldownMax = 0.2f;
-    };
+		float shootDirectionX = 0.f;
+		float shootDirectionY = 0.f;
+
+		float shootCooldown = 0.f;
+
+		int souls = 0;
+
+		float damageCooldown = 0.f;
+		float damageCooldownMax = 0.5f;
+	};
 }

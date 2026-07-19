@@ -3,13 +3,13 @@
 
 namespace EngineL {
 
-    class GameObject
-    {
-    public:
-        virtual ~GameObject() {}
+	class GameObject
+	{
+	public:
+		virtual ~GameObject() {}
 
-        virtual void update(float deltaTime) {}
-        virtual void render(Renderer& renderer) {}
-    };
+		virtual void update(float deltaTime) {}
+		virtual void render(Renderer& renderer) {}
+	};
 
 }
