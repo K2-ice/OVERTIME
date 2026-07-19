@@ -2,7 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 
-namespace Engine {
+namespace EngineL {
 
     class Window {
 
@@ -19,6 +19,6 @@ namespace Engine {
         sf::RenderWindow& getRenderWindow();
 
       private:
-        sf::RenderWindow m_window;
+        sf::RenderWindow window;
     };
 }
