@@ -284,13 +284,11 @@ void GameManager::startNewRun()
 	runTime = 0.f;
 	spawnTimer = 0.f;
 
-	// Reset player
 	player.setPosition(400.f, 300.f);
 
 	Stats& stats = player.GetStats();
 	stats.health = stats.maxHealth;
 
-	// Remove bullets
 	for (auto bullet : bullets)
 	{
 		updateManager.remove(bullet);
@@ -299,7 +297,6 @@ void GameManager::startNewRun()
 	}
 	bullets.clear();
 
-	// Remove enemies
 	for (auto enemy : enemies)
 	{
 		updateManager.remove(enemy);
@@ -308,7 +305,6 @@ void GameManager::startNewRun()
 	}
 	enemies.clear();
 
-	// Remove souls
 	for (auto soul : souls)
 	{
 		updateManager.remove(soul);

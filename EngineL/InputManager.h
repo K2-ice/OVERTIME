@@ -1,4 +1,3 @@
-// InputManager.h
 #pragma once
 #include <SFML/Graphics.hpp>
 

@@ -46,7 +46,7 @@ namespace EngineL
 
 	bool InputManager::isMovingUp() const
 	{
-		return isKeyPressed(sf::Keyboard::Key::Z);
+		return isKeyPressed(sf::Keyboard::Key::W);
 	}
 
 	bool InputManager::isMovingDown() const
@@ -56,7 +56,7 @@ namespace EngineL
 
 	bool InputManager::isMovingLeft() const
 	{
-		return isKeyPressed(sf::Keyboard::Key::Q);
+		return isKeyPressed(sf::Keyboard::Key::A);
 	}
 
 	bool InputManager::isMovingRight() const
