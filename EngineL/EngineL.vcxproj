@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Bullet.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GameEngine.h" />
@@ -153,9 +154,13 @@
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="Stats.h" />
     <ClInclude Include="UpdateManager.h" />
+    <ClInclude Include="Weapon.h" />
+    <ClInclude Include="WeaponPickup.h" />
+    <ClInclude Include="WeaponStats.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="EngineL.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="GameEngine.cpp" />
@@ -170,6 +175,9 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="UpdateManager.cpp" />
+    <ClCompile Include="Weapon.cpp" />
+    <ClCompile Include="WeaponPickup.cpp" />
+    <ClCompile Include="WeaponStats.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -63,6 +63,20 @@ void SkillTree::BuildTree()
 		{600.f,250.f},
 		{}
 		});
+
+	nodes.push_back({
+		SkillType::WeaponSlot,
+		"Sac d'armes",
+		"Debloque un second emplacement d'arme, permettant de changer d'arme au combat.",
+		0.f,
+		0,
+		1,
+		15,
+		1.f,
+		true,
+		{500.f, 450.f},
+		{}
+		});
 }
 
 void SkillTree::Buy(int index, Player& player)
@@ -108,6 +122,10 @@ void SkillTree::Buy(int index, Player& player)
 
 	case SkillType::AttackSpeed:
 		stats.attackSpeed *= node.amount;
+		break;
+
+	case SkillType::WeaponSlot:
+		player.unlockSecondWeaponSlot();
 		break;
 
 	default:

@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "InputManager.h"
 
-namespace EngineL
-{
+namespace EngineL {
+
 	void InputManager::update(const sf::RenderWindow& window)
 	{
 		for (int i = 0; i < KeyCount; i++)
@@ -72,5 +72,10 @@ namespace EngineL
 	bool InputManager::isStartPressed() const
 	{
 		return isKeyJustPressed(sf::Keyboard::Key::Enter);
+	}
+
+	bool InputManager::isReloadPressed() const
+	{
+		return isKeyJustPressed(sf::Keyboard::Key::R);
 	}
 }

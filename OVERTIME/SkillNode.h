@@ -12,6 +12,8 @@ enum class SkillType
 	AttackSpeed,
 	Range,
 
+	WeaponSlot,
+
 	UnlockBow,
 	UnlockStaff,
 	UnlockGun

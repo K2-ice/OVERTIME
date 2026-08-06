@@ -20,6 +20,7 @@ namespace EngineL
 		bool isMovingRight() const;
 		bool isPausePressed() const;
 		bool isStartPressed() const;
+		bool isReloadPressed() const;
 
 	private:
 		static const int KeyCount = 101;
