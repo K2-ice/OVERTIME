@@ -15,7 +15,6 @@ namespace EngineL
 		void aimAt(float mouseX, float mouseY);
 
 		bool wantsToShoot() const;
-		void resetShootCooldown();
 
 		float getShootDirectionX() const;
 		float getShootDirectionY() const;
@@ -26,17 +25,20 @@ namespace EngineL
 		bool canTakeDamage() const;
 		void resetDamageCooldown();
 
+		bool hasSecondWeaponSlot() const;
+		void unlockSecondWeaponSlot();
+
 	private:
 		InputManager* inputManager;
 
 		float shootDirectionX = 0.f;
 		float shootDirectionY = 0.f;
 
-		float shootCooldown = 0.f;
-
 		int souls = 0;
 
 		float damageCooldown = 0.f;
 		float damageCooldownMax = 0.5f;
+
+		bool secondWeaponSlotUnlocked = false;
 	};
 }

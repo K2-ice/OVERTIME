@@ -47,12 +47,12 @@ namespace EngineL
 		move(dx * GetStats().speed * deltaTime,
 			dy * GetStats().speed * deltaTime);
 
-		if (shootCooldown > 0.f)
+		if (damageCooldown > 0.f)
 		{
-			shootCooldown -= deltaTime;
+			damageCooldown -= deltaTime;
 
-			if (shootCooldown < 0.f)
-				shootCooldown = 0.f;
+			if (damageCooldown < 0.f)
+				damageCooldown = 0.f;
 		}
 	}
 
@@ -75,13 +75,7 @@ namespace EngineL
 
 	bool Player::wantsToShoot() const
 	{
-		return inputManager->isMouseButtonPressed(sf::Mouse::Button::Left)
-			&& shootCooldown <= 0.f;
-	}
-
-	void Player::resetShootCooldown()
-	{
-		shootCooldown = GetStats().attackSpeed;
+		return inputManager->isMouseButtonPressed(sf::Mouse::Button::Left);
 	}
 
 	bool Player::canTakeDamage() const
@@ -94,7 +88,6 @@ namespace EngineL
 		damageCooldown = damageCooldownMax;
 	}
 
-
 	float Player::getShootDirectionX() const
 	{
 		return shootDirectionX;
@@ -104,6 +97,7 @@ namespace EngineL
 	{
 		return shootDirectionY;
 	}
+
 	int Player::getSouls() const
 	{
 		return souls;
@@ -121,5 +115,15 @@ namespace EngineL
 
 		souls -= amount;
 		return true;
+	}
+
+	bool Player::hasSecondWeaponSlot() const
+	{
+		return secondWeaponSlotUnlocked;
+	}
+
+	void Player::unlockSecondWeaponSlot()
+	{
+		secondWeaponSlotUnlocked = true;
 	}
 }

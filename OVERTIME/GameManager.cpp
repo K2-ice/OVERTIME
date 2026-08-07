@@ -7,12 +7,17 @@
 GameManager::GameManager()
 	: engine(1280, 720, "OVERTIME")
 	, player(400.f, 300.f, &engine.getInputManager())
+	, hud(font)
+	, skillTreeScreen(font)
 {
 	updateManager.add(&player);
 	renderManager.add(&player);
 
+	weaponInventory.reset(player.hasSecondWeaponSlot());
+
 	if (!font.openFromFile("Assets/arial.ttf"))
 		throw std::runtime_error("Failed to load font.");
+
 	player.addSouls(50);
 }
 
@@ -38,6 +43,13 @@ GameManager::~GameManager()
 		renderManager.remove(soul);
 		delete soul;
 	}
+
+	for (auto pickup : weaponPickups)
+	{
+		updateManager.remove(pickup);
+		renderManager.remove(pickup);
+		delete pickup;
+	}
 }
 
 void GameManager::run()
@@ -46,68 +58,87 @@ void GameManager::run()
 	{
 		float deltaTime = engine.beginFrame();
 
-		sf::Vector2i mouse =
-			engine.getInputManager().getMousePosition(
-				engine.getWindow().getRenderWindow());
-
-		if (showSkillTree)
-		{
-			handleSkillTree();
-
-			if (engine.getInputManager().isStartPressed())
-			{
-				startNewRun();
-			}
-
-			renderSkillTree();
-
-			engine.endFrame();
-
-			continue;
-		}
-
-		runTime += deltaTime;
-
-		if (runTime >= maxRunTime)
-		{
-			showSkillTree = true;
-		}
-
-		player.aimAt(
-			static_cast<float>(mouse.x),
-			static_cast<float>(mouse.y));
-
-		spawnTimer += deltaTime;
-
-		if (spawnTimer >= spawnDelay)
-		{
-			spawnTimer = 0.f;
-			spawnEnemy();
-		}
-
-		handleShooting();
-
-		cleanupBullets();
-
-		renderSkillTree();
-
-		updateManager.updateAll(deltaTime);
-
-		checkBulletEnemyCollisions();
-
-		checkEnemyPlayerCollisions();
-
-		cleanupEnemies();
-
-		collectSouls();
-
-		cleanupBullets();
-
-		renderManager.renderAll(engine.getRenderer());
-
-		renderSkillTree();
+		update(deltaTime);
+		render();
 
 		engine.endFrame();
+	}
+}
+
+void GameManager::update(float deltaTime)
+{
+	if (showSkillTree)
+	{
+		skillTreeScreen.handleInput(
+			engine.getInputManager(),
+			engine.getWindow().getRenderWindow(),
+			player);
+
+		if (engine.getInputManager().isStartPressed())
+		{
+			startNewRun();
+		}
+
+		return;
+	}
+
+	sf::Vector2i mouse =
+		engine.getInputManager().getMousePosition(
+			engine.getWindow().getRenderWindow());
+
+	player.aimAt(
+		static_cast<float>(mouse.x),
+		static_cast<float>(mouse.y));
+
+	runTime += deltaTime;
+
+	if (runTime >= maxRunTime)
+	{
+		showSkillTree = true;
+		return;
+	}
+
+	spawnTimer += deltaTime;
+
+	if (spawnTimer >= spawnDelay)
+	{
+		spawnTimer = 0.f;
+		spawnEnemy();
+	}
+
+	weaponInventory.handleSwitch(engine.getInputManager(), player.hasSecondWeaponSlot());
+	handleReload();
+
+	weaponInventory.getCurrentWeapon()->update(deltaTime);
+	handleShooting();
+
+	updateManager.updateAll(deltaTime);
+
+	checkBulletEnemyCollisions();
+	checkEnemyPlayerCollisions();
+	cleanupEnemies();
+	collectSouls();
+	collectWeaponPickups();
+	cleanupBullets();
+}
+
+void GameManager::render()
+{
+	if (showSkillTree)
+	{
+		skillTreeScreen.render(engine.getWindow().getRenderWindow(), player);
+	}
+	else
+	{
+		renderGameScene();
+	}
+}
+
+void GameManager::handleReload()
+{
+	if (engine.getInputManager().isReloadPressed())
+	{
+		weaponInventory.getCurrentWeapon()->startReload();
 	}
 }
 
@@ -120,13 +151,15 @@ void GameManager::handleShooting()
 		float dirX = player.getShootDirectionX();
 		float dirY = player.getShootDirectionY();
 
-		EngineL::Bullet* bullet = new EngineL::Bullet(x, y, dirX, dirY);
+		std::vector<EngineL::Bullet*> newBullets =
+			weaponInventory.getCurrentWeapon()->fire(x, y, dirX, dirY);
 
-		bullets.push_back(bullet);
-		updateManager.add(bullet);
-		renderManager.add(bullet);
-
-		player.resetShootCooldown();
+		for (EngineL::Bullet* bullet : newBullets)
+		{
+			bullets.push_back(bullet);
+			updateManager.add(bullet);
+			renderManager.add(bullet);
+		}
 	}
 }
 
@@ -150,7 +183,6 @@ void GameManager::spawnEnemy()
 	renderManager.add(enemy);
 }
 
-
 void GameManager::cleanupBullets()
 {
 	for (int i = 0; i < bullets.size(); i++)
@@ -173,6 +205,7 @@ void GameManager::cleanupBullets()
 		}
 	}
 }
+
 void GameManager::checkBulletEnemyCollisions()
 {
 	for (int b = 0; b < bullets.size(); b++)
@@ -188,7 +221,7 @@ void GameManager::checkBulletEnemyCollisions()
 			if (bullet->getBounds().findIntersection(enemy->getBounds()))
 			{
 				enemy->takeDamage(
-					static_cast<int>(player.GetStats().damage));
+					static_cast<int>(bullet->getDamage()));
 
 				updateManager.remove(bullet);
 				renderManager.remove(bullet);
@@ -228,6 +261,18 @@ void GameManager::cleanupEnemies()
 			updateManager.add(soul);
 			renderManager.add(soul);
 
+			EngineL::WeaponPickup* pickup =
+				weaponInventory.tryDropWeapon(
+					enemy->getPosition().x,
+					enemy->getPosition().y);
+
+			if (pickup != nullptr)
+			{
+				weaponPickups.push_back(pickup);
+				updateManager.add(pickup);
+				renderManager.add(pickup);
+			}
+
 			updateManager.remove(enemy);
 			renderManager.remove(enemy);
 
@@ -262,6 +307,33 @@ void GameManager::collectSouls()
 	}
 }
 
+void GameManager::collectWeaponPickups()
+{
+	for (int i = 0; i < weaponPickups.size(); i++)
+	{
+		EngineL::WeaponPickup* pickup = weaponPickups[i];
+
+		if (player.getBounds().findIntersection(pickup->getBounds()))
+		{
+			EngineL::Weapon* weapon = weaponInventory.getWeaponById(pickup->getWeaponId());
+
+			if (weapon != nullptr && !weaponInventory.isInInventory(weapon))
+			{
+				weaponInventory.equipPickup(weapon);
+			}
+
+			updateManager.remove(pickup);
+			renderManager.remove(pickup);
+
+			delete pickup;
+
+			weaponPickups.erase(weaponPickups.begin() + i);
+
+			i--;
+		}
+	}
+}
+
 void GameManager::checkEnemyPlayerCollisions()
 {
 	for (EngineL::Enemy* enemy : enemies)
@@ -278,6 +350,7 @@ void GameManager::checkEnemyPlayerCollisions()
 		}
 	}
 }
+
 void GameManager::startNewRun()
 {
 	showSkillTree = false;
@@ -288,6 +361,8 @@ void GameManager::startNewRun()
 
 	Stats& stats = player.GetStats();
 	stats.health = stats.maxHealth;
+
+	weaponInventory.reset(player.hasSecondWeaponSlot());
 
 	for (auto bullet : bullets)
 	{
@@ -312,248 +387,25 @@ void GameManager::startNewRun()
 		delete soul;
 	}
 	souls.clear();
+
+	for (auto pickup : weaponPickups)
+	{
+		updateManager.remove(pickup);
+		renderManager.remove(pickup);
+		delete pickup;
+	}
+	weaponPickups.clear();
 }
 
-void GameManager::handleSkillTree()
+void GameManager::renderGameScene()
 {
-	auto& input = engine.getInputManager();
-	bool pressed = input.isMouseButtonPressed(sf::Mouse::Button::Left);
+	renderManager.renderAll(engine.getRenderer());
 
-	if (pressed && !mouseHeld)
-	{
-		mouseHeld = true;
-
-		sf::Vector2i mousePixel =
-			input.getMousePosition(engine.getWindow().getRenderWindow());
-
-		sf::Vector2f mouse(
-			static_cast<float>(mousePixel.x),
-			static_cast<float>(mousePixel.y));
-
-		auto& nodes = skillTree.GetNodes();
-
-		for (size_t i = 0; i < nodes.size(); i++)
-		{
-			float dx = mouse.x - nodes[i].position.x;
-			float dy = mouse.y - nodes[i].position.y;
-
-			if (dx * dx + dy * dy <= 20.f * 20.f)
-			{
-				skillTree.Buy(i, player);
-			}
-		}
-	}
-
-	if (!pressed)
-	{
-		mouseHeld = false;
-	}
-}
-std::string GameManager::FormatTime(float seconds)
-{
-	int totalSeconds = static_cast<int>(seconds);
-
-	int minutes = totalSeconds / 60;
-	int secs = totalSeconds % 60;
-
-	std::ostringstream stream;
-
-	stream << std::setfill('0')
-		<< std::setw(2) << minutes
-		<< ":"
-		<< std::setw(2) << secs;
-
-	return stream.str();
-}
-
-void GameManager::renderSkillTree()
-{
-
-	if (showSkillTree)
-	{
-		const auto mousePixel = sf::Mouse::getPosition(engine.getWindow().getRenderWindow());
-		const sf::Vector2f mouse = engine.getWindow().getRenderWindow().mapPixelToCoords(mousePixel);
-
-		const SkillNode* hoveredNode = nullptr;
-
-		const auto& nodes = skillTree.GetNodes();
-
-		sf::Text text(font);
-
-		text.setCharacterSize(26);
-		text.setFillColor(sf::Color::White);
-
-		text.setString("Souls: " + std::to_string(player.getSouls()));
-
-		sf::FloatRect bounds = text.getLocalBounds();
-
-		text.setPosition({
-			static_cast<float>(engine.getWindow().getRenderWindow().getSize().x) - bounds.size.x - 20.f,
-			20.f
-			});
-
-		engine.getWindow().getRenderWindow().draw(text);
-
-		text.setCharacterSize(24);
-		text.setFillColor(sf::Color::White);
-
-		text.setString("Press ENTER\nTo Start Run");
-
-		bounds = text.getLocalBounds();
-
-		text.setPosition({
-			static_cast<float>(engine.getWindow().getRenderWindow().getSize().x) - bounds.size.x - 20.f,
-			static_cast<float>(engine.getWindow().getRenderWindow().getSize().y) - bounds.size.y - 30.f
-			});
-
-		engine.getWindow().getRenderWindow().draw(text);
-
-		for (const auto& node : nodes)
-		{
-			for (int childIndex : node.children)
-			{
-				const auto& child = nodes[childIndex];
-
-				sf::Vertex line[]
-				{
-					sf::Vertex(node.position, sf::Color(120, 120, 120)),
-					sf::Vertex(child.position, sf::Color(120, 120, 120))
-				};
-
-				engine.getWindow().getRenderWindow().draw(line, 2, sf::PrimitiveType::Lines);
-			}
-		}
-
-		for (const auto& node : nodes)
-		{
-			sf::CircleShape circle(20.f);
-
-			circle.setOrigin({ 20.f, 20.f });
-			circle.setPosition(node.position);
-
-			if (node.level >= node.maxLevel)
-			{
-				circle.setFillColor(sf::Color(255, 215, 0));
-			}
-			else if (!node.unlocked)
-			{
-				circle.setFillColor(sf::Color(80, 80, 80));
-			}
-			else if (player.getSouls() < node.cost)
-			{
-				circle.setFillColor(sf::Color(200, 50, 50));
-			}
-			else
-			{
-				circle.setFillColor(sf::Color::Green);
-			}
-
-			float dx = mouse.x - node.position.x;
-			float dy = mouse.y - node.position.y;
-
-			if (dx * dx + dy * dy <= 20.f * 20.f)
-			{
-				hoveredNode = &node;
-
-				circle.setScale({ 1.15f, 1.15f });
-				circle.setOutlineThickness(3.f);
-				circle.setOutlineColor(sf::Color::White);
-			}
-
-			engine.getWindow().getRenderWindow().draw(circle);
-		}
-
-		if (hoveredNode)
-		{
-			sf::RectangleShape box;
-
-			box.setPosition(mouse + sf::Vector2f(25.f, 25.f));
-			box.setSize({ 320.f, 180.f });
-
-			box.setFillColor(sf::Color(25, 25, 25, 240));
-			box.setOutlineThickness(2.f);
-			box.setOutlineColor(sf::Color::White);
-
-			engine.getWindow().getRenderWindow().draw(box);
-
-			text.setCharacterSize(17);
-			text.setFillColor(sf::Color::White);
-
-			std::string status;
-
-			if (hoveredNode->level >= hoveredNode->maxLevel)
-			{
-				status = "Max Level";
-			}
-			else if (hoveredNode->level > 0)
-			{
-				status = "Upgraded";
-			}
-			else if (hoveredNode->unlocked)
-			{
-				status = "Available";
-			}
-			else
-			{
-				status = "Locked";
-			}
-
-			text.setString(
-				hoveredNode->name +
-				"\n\n" +
-				hoveredNode->description +
-				"\n\nLevel: " +
-				std::to_string(hoveredNode->level) +
-				" / " +
-				std::to_string(hoveredNode->maxLevel) +
-				"\n\nCost: " +
-				std::to_string(hoveredNode->cost) +
-				" Souls" +
-				"\nStatus: " +
-				status);
-
-			text.setPosition(mouse + sf::Vector2f(35.f, 35.f));
-
-			engine.getWindow().getRenderWindow().draw(text);
-		}
-	}
-	else
-	{
-		renderManager.renderAll(engine.getRenderer());
-
-		sf::Text text(font);
-
-		text.setCharacterSize(30);
-		text.setFillColor(sf::Color::White);
-
-		text.setString(
-			FormatTime(runTime) +
-			" / " +
-			FormatTime(maxRunTime));
-
-		sf::FloatRect bounds = text.getLocalBounds();
-
-		text.setPosition({
-			engine.getWindow().getRenderWindow().getSize().x / 2.f - bounds.size.x / 2.f,
-			20.f
-			});
-
-		engine.getWindow().getRenderWindow().draw(text);
-
-		text.setCharacterSize(30);
-		text.setFillColor(sf::Color::White);
-
-		text.setString(
-			"HP: " +
-			std::to_string(static_cast<int>(player.GetStats().health)) +
-			" / " +
-			std::to_string(static_cast<int>(player.GetStats().maxHealth)));
-
-		text.setPosition({
-			10.f,
-			20.f
-			});
-
-		engine.getWindow().getRenderWindow().draw(text);
-	}
+	hud.draw(
+		engine.getWindow().getRenderWindow(),
+		player,
+		weaponInventory.getCurrentWeapon(),
+		runTime,
+		maxRunTime,
+		player.hasSecondWeaponSlot());
 }

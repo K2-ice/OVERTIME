@@ -1,19 +1,22 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include "GameEngine.h"
 #include "Player.h"
 #include "Bullet.h"
 #include "Enemy.h"
 #include "Soul.h"
+#include "WeaponPickup.h"
+#include "WeaponInventory.h"
 
 #include "UpdateManager.h"
 #include "RenderManager.h"
-#include "SkillTree.h"
+#include "SkillTreeScreen.h"
+#include "HUD.h"
 
 #include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/Text.hpp>
 
 class GameManager
 {
@@ -24,10 +27,23 @@ public:
 	void run();
 
 private:
+	void update(float deltaTime);
+	void render();
+
 	void handleShooting();
+	void handleReload();
 
 	void spawnEnemy();
 	void cleanupBullets();
+
+	void startNewRun();
+	void renderGameScene();
+
+	void checkBulletEnemyCollisions();
+	void cleanupEnemies();
+	void collectSouls();
+	void collectWeaponPickups();
+	void checkEnemyPlayerCollisions();
 
 	EngineL::GameEngine engine;
 
@@ -39,11 +55,12 @@ private:
 	std::vector<EngineL::Bullet*> bullets;
 	std::vector<EngineL::Enemy*> enemies;
 	std::vector<EngineL::Soul*> souls;
+	std::vector<EngineL::WeaponPickup*> weaponPickups;
+
+	WeaponInventory weaponInventory;
 
 	float spawnTimer = 0.f;
 	float spawnDelay = 1.f;
-
-	SkillTree skillTree;
 
 	bool showSkillTree = false;
 
@@ -51,15 +68,6 @@ private:
 	float maxRunTime = 10.f;
 
 	sf::Font font;
-
-	void startNewRun();
-	bool mouseHeld = false;
-	void handleSkillTree();
-	void renderSkillTree();
-	std::string FormatTime(float seconds);
-
-	void checkBulletEnemyCollisions();
-	void cleanupEnemies();
-	void collectSouls();
-	void checkEnemyPlayerCollisions();
+	HUD hud;
+	SkillTreeScreen skillTreeScreen;
 };
