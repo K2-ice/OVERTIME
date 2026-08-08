@@ -3,6 +3,12 @@
 
 namespace EngineL
 {
+	enum class KeyLayout
+	{
+		AZERTY,
+		QWERTY
+	};
+
 	class InputManager
 	{
 	public:
@@ -22,6 +28,9 @@ namespace EngineL
 		bool isStartPressed() const;
 		bool isReloadPressed() const;
 
+		void setKeyLayout(KeyLayout layout);
+		KeyLayout getKeyLayout() const;
+
 	private:
 		static const int KeyCount = 101;
 		static const int MouseButtonCount = 5;
@@ -30,5 +39,7 @@ namespace EngineL
 		bool previousKeys[KeyCount];
 
 		bool currentMouseButtons[MouseButtonCount];
+
+		KeyLayout keyLayout = KeyLayout::AZERTY;
 	};
 }

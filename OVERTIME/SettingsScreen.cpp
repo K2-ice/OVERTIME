@@ -3,12 +3,19 @@
 
 namespace
 {
+    const sf::FloatRect kVolumeMinusBounds({ 490.f, 280.f }, { 50.f, 50.f });
+    const sf::FloatRect kVolumePlusBounds({ 640.f, 280.f }, { 50.f, 50.f });
     const sf::FloatRect kBackButtonBounds({ 490.f, 500.f }, { 300.f, 70.f });
 }
 
 SettingsScreen::SettingsScreen(sf::Font& font)
     : font(font)
 {
+}
+
+int SettingsScreen::getVolume() const
+{
+    return volume;
 }
 
 SettingsAction SettingsScreen::handleInput(EngineL::InputManager& input, const sf::RenderWindow& window)
@@ -24,8 +31,24 @@ SettingsAction SettingsScreen::handleInput(EngineL::InputManager& input, const s
         sf::Vector2i mousePixel = input.getMousePosition(window);
         sf::Vector2f mouse(static_cast<float>(mousePixel.x), static_cast<float>(mousePixel.y));
 
-        if (kBackButtonBounds.contains(mouse))
+        if (kVolumeMinusBounds.contains(mouse))
+        {
+            volume -= 10;
+
+            if (volume < 0)
+                volume = 0;
+        }
+        else if (kVolumePlusBounds.contains(mouse))
+        {
+            volume += 10;
+
+            if (volume > 100)
+                volume = 100;
+        }
+        else if (kBackButtonBounds.contains(mouse))
+        {
             action = SettingsAction::Back;
+        }
     }
 
     if (!pressed)
@@ -49,19 +72,27 @@ void SettingsScreen::render(sf::RenderWindow& window)
 
     window.draw(title);
 
-    sf::Text placeholder(font);
-    placeholder.setCharacterSize(22);
-    placeholder.setFillColor(sf::Color(180, 180, 180));
-    placeholder.setString("Options a venir...");
+    // Label "Volume"
+    sf::Text volumeLabel(font);
+    volumeLabel.setCharacterSize(24);
+    volumeLabel.setFillColor(sf::Color::White);
+    volumeLabel.setString("Volume : " + std::to_string(volume) + " %");
 
-    sf::FloatRect placeholderBounds = placeholder.getLocalBounds();
-    placeholder.setPosition({
-        window.getSize().x / 2.f - placeholderBounds.size.x / 2.f,
-        250.f
+    sf::FloatRect volumeLabelBounds = volumeLabel.getLocalBounds();
+    volumeLabel.setPosition({
+        window.getSize().x / 2.f - volumeLabelBounds.size.x / 2.f,
+        220.f
         });
 
-    window.draw(placeholder);
+    window.draw(volumeLabel);
 
+    // Bouton -
+    drawButton(window, kVolumeMinusBounds, "-");
+
+    // Bouton +
+    drawButton(window, kVolumePlusBounds, "+");
+
+    // Bouton Retour
     drawButton(window, kBackButtonBounds, "Retour");
 }
 

@@ -11,66 +11,52 @@
 #include "EnemyManager.h"
 #include "UpdateManager.h"
 #include "RenderManager.h"
-#include "SkillTreeScreen.h"
-#include "MainMenuScreen.h"
-#include "SettingsScreen.h"
-#include "PauseScreen.h"
-#include "GameOverScreen.h"
+#include "SceneManager.h"
 #include "HUD.h"
 #include <SFML/Graphics/Font.hpp>
-
-enum class GameState
-{
-    MainMenu,
-    Playing,
-    Paused,
-    SkillTree,
-    Settings,
-    GameOver
-};
 
 class GameManager
 {
 public:
-    GameManager();
-    ~GameManager();
-    void run();
+	GameManager();
+	~GameManager();
+
+	void run();
 
 private:
-    void update(float deltaTime);
-    void render();
-    void handleShooting();
-    void handleReload();
-    void cleanupBullets();
-    void handleEnemyDeaths();
-    void startNewRun();
-    void renderGameScene();
-    void collectSouls();
-    void collectWeaponPickups();
 
-    EngineL::GameEngine engine;
-    EngineL::Player player;
-    EngineL::UpdateManager updateManager;
-    EngineL::RenderManager renderManager;
+	void update(float deltaTime);
+	void render();
 
-    EngineL::EnemyManager enemyManager;
+	void handleShooting();
+	void handleReload();
 
-    std::vector<EngineL::Bullet*> bullets;
-    std::vector<EngineL::Soul*> souls;
-    std::vector<EngineL::WeaponPickup*> weaponPickups;
+	void cleanupBullets();
+	void handleEnemyDeaths();
 
-    WeaponInventory weaponInventory;
+	void startNewRun();
+	void renderGameScene();
 
-    GameState state = GameState::MainMenu;
+	void collectSouls();
+	void collectWeaponPickups();
 
-    float runTime = 0.f;
-    float maxRunTime = 10.f;
+	EngineL::GameEngine engine;
+	EngineL::Player player;
+	EngineL::UpdateManager updateManager;
+	EngineL::RenderManager renderManager;
 
-    sf::Font font;
-    HUD hud;
-    SkillTreeScreen skillTreeScreen;
-    MainMenuScreen mainMenuScreen;
-    SettingsScreen settingsScreen;
-    PauseScreen pauseScreen;
-    GameOverScreen gameOverScreen;
+	EngineL::EnemyManager enemyManager;
+
+	std::vector<EngineL::Bullet*> bullets;
+	std::vector<EngineL::Soul*> souls;
+	std::vector<EngineL::WeaponPickup*> weaponPickups;
+
+	WeaponInventory weaponInventory;
+
+	float runTime = 0.f;
+	float maxRunTime = 10.f;
+
+	sf::Font font;
+	HUD hud;
+	SceneManager sceneManager;
 };

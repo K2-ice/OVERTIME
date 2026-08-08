@@ -3,19 +3,21 @@
 
 namespace EngineL
 {
-    class Bullet : public Entity
-    {
-    public:
-        Bullet(float x, float y, float directionX, float directionY, float damage);
+	class Bullet : public Entity {
 
-        void update(float deltaTime) override;
+	public:
 
-        float getDamage() const;
+		Bullet(float x, float y, float directionX, float directionY, float damage, sf::Color color = sf::Color::Yellow);
 
-    private:
-        float directionX;
-        float directionY;
-        float speed = 600.f;
-        float damage;
-    };
+		void update(float deltaTime) override;
+
+		float getDamage() const;
+
+	private:
+
+		float directionX;
+		float directionY;
+		float speed = 600.f;
+		float damage;
+	};
 }

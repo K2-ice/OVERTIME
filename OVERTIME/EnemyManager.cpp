@@ -37,7 +37,26 @@ namespace EngineL
         float x = playerPosition.x + std::cos(angle) * 500.f;
         float y = playerPosition.y + std::sin(angle) * 500.f;
 
-        Enemy* enemy = new Enemy(x, y, player);
+        int roll = rand() % 100;
+
+        Enemy* enemy = nullptr;
+
+        if (roll < 45)
+        {
+            enemy = new Enemy(x, y, player);           // Basique : 45%
+        }
+        else if (roll < 65)
+        {
+            enemy = new KamikazeEnemy(x, y, player);    // Kamikaze : 20%
+        }
+        else if (roll < 85)
+        {
+            enemy = new MeleeEnemy(x, y, player);       // Corps a corps : 20%
+        }
+        else
+        {
+            enemy = new BelierEnemy(x, y, player);         // Belier : 15%
+        }
 
         enemies.push_back(enemy);
 
@@ -91,7 +110,14 @@ namespace EngineL
                     player->resetDamageCooldown();
                 }
 
-                pushEnemyAwayFromPlayer(enemy);
+                if (enemy->explodesOnContact())
+                {
+                    enemy->takeDamage(9999);
+                }
+                else
+                {
+                    pushEnemyAwayFromPlayer(enemy);
+                }
             }
         }
     }

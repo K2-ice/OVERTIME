@@ -2,6 +2,9 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "Enemy.h"
+#include "KamikazeEnemy.h"
+#include "MeleeEnemy.h"
+#include "BelierEnemy.h"
 #include "Player.h"
 #include "Bullet.h"
 #include "UpdateManager.h"

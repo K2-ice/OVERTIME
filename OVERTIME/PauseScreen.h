@@ -6,6 +6,7 @@ enum class PauseAction
 {
     None,
     Resume,
+    SkillTree,
     QuitToMenu
 };
 
