@@ -17,6 +17,7 @@ namespace EngineL
 		currentAmmo = magazineSize;
 
 		reserveAmmo = stats.reserveAmmo;
+		startingReserveAmmo = stats.reserveAmmo;
 		infiniteReserve = (reserveAmmo < 0);
 	}
 
@@ -112,6 +113,15 @@ namespace EngineL
 	bool Weapon::isReloading() const
 	{
 		return reloading;
+	}
+
+	void Weapon::resetAmmo()
+	{
+		currentAmmo = magazineSize;
+		reserveAmmo = startingReserveAmmo;
+		reloading = false;
+		reloadTimer = 0.f;
+		cooldown = 0.f;
 	}
 
 	std::string Weapon::getName() const

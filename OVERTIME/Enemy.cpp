@@ -13,8 +13,8 @@ namespace EngineL
 		Stats s;
 		s.health = 30;
 		s.maxHealth = 30;
-		s.speed = 120.f;
-		s.damage = 5.f;
+		s.speed = 150.f;
+		s.damage = 7.f;
 
 		setStats(s);
 	}

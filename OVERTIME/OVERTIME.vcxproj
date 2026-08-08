@@ -165,9 +165,13 @@
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyManager.cpp" />
     <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="GameOverScreen.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MainMenuScreen.cpp" />
+    <ClCompile Include="PauseScreen.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SettingsScreen.cpp" />
     <ClCompile Include="SkillTree.cpp" />
     <ClCompile Include="SkillTreeScreen.cpp" />
     <ClCompile Include="Soul.cpp" />
@@ -183,8 +187,12 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyManager.h" />
     <ClInclude Include="GameManager.h" />
+    <ClInclude Include="GameOverScreen.h" />
     <ClInclude Include="HUD.h" />
+    <ClInclude Include="MainMenuScreen.h" />
+    <ClInclude Include="PauseScreen.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="SettingsScreen.h" />
     <ClInclude Include="SkillNode.h" />
     <ClInclude Include="SkillTree.h" />
     <ClInclude Include="SkillTreeScreen.h" />

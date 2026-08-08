@@ -1,73 +1,76 @@
 #pragma once
-
 #include <vector>
 #include <string>
-
 #include "GameEngine.h"
 #include "Player.h"
 #include "Bullet.h"
-#include "Enemy.h"
 #include "Soul.h"
 #include "WeaponPickup.h"
 #include "WeaponInventory.h"
-
+#include "CollisionManager.h"
+#include "EnemyManager.h"
 #include "UpdateManager.h"
 #include "RenderManager.h"
 #include "SkillTreeScreen.h"
+#include "MainMenuScreen.h"
+#include "SettingsScreen.h"
+#include "PauseScreen.h"
+#include "GameOverScreen.h"
 #include "HUD.h"
-
 #include <SFML/Graphics/Font.hpp>
+
+enum class GameState
+{
+    MainMenu,
+    Playing,
+    Paused,
+    SkillTree,
+    Settings,
+    GameOver
+};
 
 class GameManager
 {
 public:
-	GameManager();
-	~GameManager();
-
-	void run();
+    GameManager();
+    ~GameManager();
+    void run();
 
 private:
-	void update(float deltaTime);
-	void render();
+    void update(float deltaTime);
+    void render();
+    void handleShooting();
+    void handleReload();
+    void cleanupBullets();
+    void handleEnemyDeaths();
+    void startNewRun();
+    void renderGameScene();
+    void collectSouls();
+    void collectWeaponPickups();
 
-	void handleShooting();
-	void handleReload();
+    EngineL::GameEngine engine;
+    EngineL::Player player;
+    EngineL::UpdateManager updateManager;
+    EngineL::RenderManager renderManager;
 
-	void spawnEnemy();
-	void cleanupBullets();
+    EngineL::EnemyManager enemyManager;
 
-	void startNewRun();
-	void renderGameScene();
+    std::vector<EngineL::Bullet*> bullets;
+    std::vector<EngineL::Soul*> souls;
+    std::vector<EngineL::WeaponPickup*> weaponPickups;
 
-	void checkBulletEnemyCollisions();
-	void cleanupEnemies();
-	void collectSouls();
-	void collectWeaponPickups();
-	void checkEnemyPlayerCollisions();
+    WeaponInventory weaponInventory;
 
-	EngineL::GameEngine engine;
+    GameState state = GameState::MainMenu;
 
-	EngineL::Player player;
+    float runTime = 0.f;
+    float maxRunTime = 10.f;
 
-	EngineL::UpdateManager updateManager;
-	EngineL::RenderManager renderManager;
-
-	std::vector<EngineL::Bullet*> bullets;
-	std::vector<EngineL::Enemy*> enemies;
-	std::vector<EngineL::Soul*> souls;
-	std::vector<EngineL::WeaponPickup*> weaponPickups;
-
-	WeaponInventory weaponInventory;
-
-	float spawnTimer = 0.f;
-	float spawnDelay = 1.f;
-
-	bool showSkillTree = false;
-
-	float runTime = 0.f;
-	float maxRunTime = 10.f;
-
-	sf::Font font;
-	HUD hud;
-	SkillTreeScreen skillTreeScreen;
+    sf::Font font;
+    HUD hud;
+    SkillTreeScreen skillTreeScreen;
+    MainMenuScreen mainMenuScreen;
+    SettingsScreen settingsScreen;
+    PauseScreen pauseScreen;
+    GameOverScreen gameOverScreen;
 };

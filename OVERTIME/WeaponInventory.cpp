@@ -13,6 +13,10 @@ WeaponInventory::WeaponInventory()
 
 void WeaponInventory::reset(bool hasSecondWeaponSlot)
 {
+    pistol.resetAmmo();
+    mitraillette.resetAmmo();
+    shotgun.resetAmmo();
+
     weaponSlots.clear();
     weaponSlots.push_back(&pistol);
 
