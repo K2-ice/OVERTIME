@@ -6,266 +6,298 @@
 
 namespace EngineL
 {
-    EnemyManager::EnemyManager(UpdateManager& updateManager, RenderManager& renderManager, Player* player)
-        : updateManager(updateManager)
-        , renderManager(renderManager)
-        , player(player)
-    {
-    }
+	EnemyManager::EnemyManager(UpdateManager& updateManager, RenderManager& renderManager, Player* player)
+		: updateManager(updateManager)
+		, renderManager(renderManager)
+		, player(player)
+	{
+	}
 
-    std::vector<Enemy*>& EnemyManager::getEnemies()
-    {
-        return enemies;
-    }
+	std::vector<Enemy*>& EnemyManager::getEnemies()
+	{
+		return enemies;
+	}
 
-    void EnemyManager::update(float deltaTime, float runTime)
-    {
-        spawnTimer += deltaTime;
+	void EnemyManager::update(float deltaTime, float runTime)
+	{
+		spawnTimer += deltaTime;
 
-        if (spawnTimer >= spawnDelay)
-        {
-            spawnTimer = 0.f;
-            spawnEnemy();
-        }
+		if (spawnTimer >= spawnDelay)
+		{
+			spawnTimer = 0.f;
+			spawnEnemy();
+		}
 
-        if (!bossSpawned && runTime >= bossSpawnTime)
-        {
-            spawnBoss();
-        }
+		if (!bossSpawned && runTime >= bossSpawnTime)
+		{
+			spawnBoss();
+		}
 
-        updateBossAttacks();
-    }
+		updateBossAttacks();
+	}
 
-    void EnemyManager::spawnEnemy()
-    {
-        sf::Vector2f playerPosition = player->getPosition();
+	void EnemyManager::spawnEnemy()
+	{
+		sf::Vector2f playerPosition = player->getPosition();
 
-        float angle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 6.2831853f;
+		float angle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 6.2831853f;
 
-        float x = playerPosition.x + std::cos(angle) * 500.f;
-        float y = playerPosition.y + std::sin(angle) * 500.f;
+		float x = playerPosition.x + std::cos(angle) * 500.f;
+		float y = playerPosition.y + std::sin(angle) * 500.f;
 
-        int roll = rand() % 100;
+		int roll = rand() % 100;
 
-        Enemy* enemy = nullptr;
+		Enemy* enemy = nullptr;
 
-        if (roll < 45)
-        {
-            enemy = new Enemy(x, y, player);           // Basique : 45%
-        }
-        else if (roll < 65)
-        {
-            enemy = new KamikazeEnemy(x, y, player);    // Kamikaze : 20%
-        }
-        else if (roll < 85)
-        {
-            enemy = new MeleeEnemy(x, y, player);       // Corps a corps : 20%
-        }
-        else
-        {
-            enemy = new BelierEnemy(x, y, player);         // Belier : 15%
-        }
+		if (roll < 45)
+		{
+			enemy = new Enemy(x, y, player, player->GetStats().difficulty);           // Basique : 45%
+		}
+		else if (roll < 65)
+		{
+			enemy = new KamikazeEnemy(x, y, player, player->GetStats().difficulty);    // Kamikaze : 20%
+		}
+		else if (roll < 85)
+		{
+			enemy = new MeleeEnemy(x, y, player, player->GetStats().difficulty);       // Corps a corps : 20%
+		}
+		else
+		{
+			enemy = new BelierEnemy(x, y, player, player->GetStats().difficulty);         // Belier : 15%
+		}
 
-        enemies.push_back(enemy);
+		enemies.push_back(enemy);
 
-        updateManager.add(enemy);
-        renderManager.add(enemy);
-    }
+		updateManager.add(enemy);
+		renderManager.add(enemy);
+	}
 
-    void EnemyManager::spawnBoss()
-    {
-        bossSpawned = true;
+	void EnemyManager::spawnBoss()
+	{
+		bossSpawned = true;
 
-        sf::Vector2f playerPosition = player->getPosition();
+		sf::Vector2f playerPosition = player->getPosition();
 
-        float angle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 6.2831853f;
+		float angle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 6.2831853f;
 
-        float x = playerPosition.x + std::cos(angle) * 500.f;
-        float y = playerPosition.y + std::sin(angle) * 500.f;
+		float x = playerPosition.x + std::cos(angle) * 500.f;
+		float y = playerPosition.y + std::sin(angle) * 500.f;
 
-        boss = new Boss(x, y, player);
+		boss = new Boss(x, y, player, player->GetStats().difficulty);
 
-        enemies.push_back(boss);
+		enemies.push_back(boss);
 
-        updateManager.add(boss);
-        renderManager.add(boss);
-    }
+		updateManager.add(boss);
+		renderManager.add(boss);
+	}
 
-    void EnemyManager::updateBossAttacks()
-    {
-        if (boss == nullptr || !boss->isAlive())
-            return;
+	void EnemyManager::updateBossAttacks()
+	{
+		if (boss == nullptr || !boss->isAlive())
+			return;
 
-        if (boss->wantsToFire())
-        {
-            std::vector<Bullet*> newBullets = boss->fire();
+		if (boss->wantsToFire())
+		{
+			std::vector<Bullet*> newBullets = boss->fire();
 
-            for (Bullet* bullet : newBullets)
-            {
-                enemyBullets.push_back(bullet);
-                updateManager.add(bullet);
-                renderManager.add(bullet);
-            }
-        }
-    }
+			for (Bullet* bullet : newBullets)
+			{
+				enemyBullets.push_back(bullet);
+				updateManager.add(bullet);
+				renderManager.add(bullet);
+			}
+		}
+	}
 
-    void EnemyManager::checkBulletCollisions(std::vector<Bullet*>& bullets)
-    {
-        for (int b = 0; b < bullets.size(); b++)
-        {
-            Bullet* bullet = bullets[b];
+	void EnemyManager::checkBulletCollisions(std::vector<Bullet*>& bullets)
+	{
+		for (int b = 0; b < static_cast<int>(bullets.size()); b++)
+		{
+			Bullet* bullet = bullets[b];
 
-            bool bulletDestroyed = false;
+			bool bulletDestroyed = false;
 
-            for (int e = 0; e < enemies.size(); e++)
-            {
-                Enemy* enemy = enemies[e];
+			for (int e = 0; e < static_cast<int>(enemies.size()); e++)
+			{
+				Enemy* enemy = enemies[e];
 
-                if (CollisionManager::checkCollision(bullet, enemy))
-                {
-                    enemy->takeDamage(static_cast<int>(bullet->getDamage()));
+				if (!enemy->isAlive())
+					continue;
 
-                    updateManager.remove(bullet);
-                    renderManager.remove(bullet);
+				if (CollisionManager::checkCollision(bullet, enemy))
+				{
+					float damage = bullet->getDamage();
 
-                    delete bullet;
+					float rollCrit =
+						static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
-                    bullets.erase(bullets.begin() + b);
-                    b--;
+					bool isCrit =
+						rollCrit < player->GetStats().critChance;
 
-                    bulletDestroyed = true;
-                    break;
-                }
-            }
+					if (isCrit)
+					{
+						damage *= player->GetStats().critDamage;
+					}
 
-            if (bulletDestroyed)
-                continue;
-        }
-    }
+					if (player->GetStats().health < player->GetStats().maxHealth)
+					{
+						float lifestealAmount =
+							damage * player->GetStats().lifesteal;
 
-    void EnemyManager::checkEnemyBulletCollisions()
-    {
-        for (int b = 0; b < enemyBullets.size(); b++)
-        {
-            Bullet* bullet = enemyBullets[b];
+						float missingHealth =
+							player->GetStats().maxHealth -
+							player->GetStats().health;
 
-            if (CollisionManager::checkCollision(bullet, player))
-            {
-                if (player->canTakeDamage())
-                {
-                    player->takeDamage(static_cast<int>(bullet->getDamage()));
-                    player->resetDamageCooldown();
-                }
+						if (lifestealAmount > missingHealth)
+							lifestealAmount = missingHealth;
 
-                updateManager.remove(bullet);
-                renderManager.remove(bullet);
+						player->takeDamage(
+							-static_cast<int>(lifestealAmount));
+					}
 
-                delete bullet;
+					enemy->takeDamage(static_cast<int>(damage));
 
-                enemyBullets.erase(enemyBullets.begin() + b);
-                b--;
-            }
-        }
-    }
+					updateManager.remove(bullet);
+					renderManager.remove(bullet);
 
-    void EnemyManager::checkPlayerCollision()
-    {
-        for (Enemy* enemy : enemies)
-        {
-            if (CollisionManager::checkCollision(enemy, player))
-            {
-                if (player->canTakeDamage())
-                {
-                    player->takeDamage(static_cast<int>(enemy->GetStats().damage));
-                    player->resetDamageCooldown();
-                }
+					delete bullet;
 
-                if (enemy->explodesOnContact())
-                {
-                    enemy->takeDamage(9999);
-                }
-                else
-                {
-                    pushEnemyAwayFromPlayer(enemy);
-                }
-            }
-        }
-    }
+					bullets.erase(bullets.begin() + b);
+					b--;
 
-    void EnemyManager::pushEnemyAwayFromPlayer(Enemy* enemy)
-    {
-        sf::Vector2f enemyPos = enemy->getPosition();
-        sf::Vector2f playerPos = player->getPosition();
+					bulletDestroyed = true;
+					break;
+				}
+			}
 
-        float dx = enemyPos.x - playerPos.x;
-        float dy = enemyPos.y - playerPos.y;
+			if (bulletDestroyed)
+				continue;
+		}
+	}
 
-        float length = std::sqrt(dx * dx + dy * dy);
+	void EnemyManager::checkEnemyBulletCollisions()
+	{
+		for (int b = 0; b < enemyBullets.size(); b++)
+		{
+			Bullet* bullet = enemyBullets[b];
 
-        if (length == 0.f)
-        {
-            dx = 1.f;
-            dy = 0.f;
-            length = 1.f;
-        }
+			if (CollisionManager::checkCollision(bullet, player))
+			{
+				if (player->canTakeDamage())
+				{
+					player->takeDamage(static_cast<int>(bullet->getDamage()));
+					player->resetDamageCooldown();
+				}
 
-        dx /= length;
-        dy /= length;
+				updateManager.remove(bullet);
+				renderManager.remove(bullet);
 
-        float pushDistance = 3.f;
+				delete bullet;
 
-        enemy->setPosition(enemyPos.x + dx * pushDistance, enemyPos.y + dy * pushDistance);
-    }
+				enemyBullets.erase(enemyBullets.begin() + b);
+				b--;
+			}
+		}
+	}
 
-    std::vector<sf::Vector2f> EnemyManager::removeDeadEnemies()
-    {
-        std::vector<sf::Vector2f> deathPositions;
+	void EnemyManager::checkPlayerCollision()
+	{
+		for (Enemy* enemy : enemies)
+		{
+			if (CollisionManager::checkCollision(enemy, player))
+			{
+				if (player->canTakeDamage())
+				{
+					player->takeDamage(static_cast<int>(enemy->GetStats().damage));
+					player->resetDamageCooldown();
+				}
 
-        for (int i = 0; i < enemies.size(); i++)
-        {
-            Enemy* enemy = enemies[i];
+				if (enemy->explodesOnContact())
+				{
+					enemy->takeDamage(9999);
+				}
+				else
+				{
+					pushEnemyAwayFromPlayer(enemy);
+				}
+			}
+		}
+	}
 
-            if (!enemy->isAlive())
-            {
-                deathPositions.push_back(enemy->getPosition());
+	void EnemyManager::pushEnemyAwayFromPlayer(Enemy* enemy)
+	{
+		sf::Vector2f enemyPos = enemy->getPosition();
+		sf::Vector2f playerPos = player->getPosition();
 
-                if (enemy == boss)
-                    boss = nullptr;
+		float dx = enemyPos.x - playerPos.x;
+		float dy = enemyPos.y - playerPos.y;
 
-                updateManager.remove(enemy);
-                renderManager.remove(enemy);
+		float length = std::sqrt(dx * dx + dy * dy);
 
-                delete enemy;
+		if (length == 0.f)
+		{
+			dx = 1.f;
+			dy = 0.f;
+			length = 1.f;
+		}
 
-                enemies.erase(enemies.begin() + i);
-                i--;
-            }
-        }
+		dx /= length;
+		dy /= length;
 
-        return deathPositions;
-    }
+		float pushDistance = 3.f;
 
-    void EnemyManager::clear()
-    {
-        for (Enemy* enemy : enemies)
-        {
-            updateManager.remove(enemy);
-            renderManager.remove(enemy);
-            delete enemy;
-        }
+		enemy->setPosition(enemyPos.x + dx * pushDistance, enemyPos.y + dy * pushDistance);
+	}
 
-        enemies.clear();
+	std::vector<sf::Vector2f> EnemyManager::removeDeadEnemies()
+	{
+		std::vector<sf::Vector2f> deathPositions;
 
-        for (Bullet* bullet : enemyBullets)
-        {
-            updateManager.remove(bullet);
-            renderManager.remove(bullet);
-            delete bullet;
-        }
+		for (int i = 0; i < enemies.size(); i++)
+		{
+			Enemy* enemy = enemies[i];
 
-        enemyBullets.clear();
+			if (!enemy->isAlive())
+			{
+				deathPositions.push_back(enemy->getPosition());
 
-        boss = nullptr;
-        bossSpawned = false;
-    }
+				if (enemy == boss)
+					boss = nullptr;
+
+				updateManager.remove(enemy);
+				renderManager.remove(enemy);
+
+				delete enemy;
+
+				enemies.erase(enemies.begin() + i);
+				i--;
+			}
+		}
+
+		return deathPositions;
+	}
+
+	void EnemyManager::clear()
+	{
+		for (Enemy* enemy : enemies)
+		{
+			updateManager.remove(enemy);
+			renderManager.remove(enemy);
+			delete enemy;
+		}
+
+		enemies.clear();
+
+		for (Bullet* bullet : enemyBullets)
+		{
+			updateManager.remove(bullet);
+			renderManager.remove(bullet);
+			delete bullet;
+		}
+
+		enemyBullets.clear();
+
+		boss = nullptr;
+		bossSpawned = false;
+	}
 }

@@ -9,25 +9,25 @@ namespace EngineL
 	public:
 
 		Player(float x, float y, InputManager* inputManager, Map* map);
-		
+
 		void update(float deltaTime) override;
 		void aimAt(float mouseX, float mouseY);
-		
+
 		bool wantsToShoot() const;
 		float getShootDirectionX() const;
 		float getShootDirectionY() const;
-		
+
 		int getSouls() const;
-		
+
 		void addSouls(int amount);
-		
+
 		bool spendSouls(int amount);
 		bool canTakeDamage() const;
-		
+
 		void resetDamageCooldown();
-		
+
 		bool hasSecondWeaponSlot() const;
-		
+
 		void unlockSecondWeaponSlot();
 
 		float getMaxTime() const;

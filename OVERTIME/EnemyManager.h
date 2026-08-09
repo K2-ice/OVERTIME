@@ -13,38 +13,38 @@
 #include "CollisionManager.h"
 namespace EngineL
 {
-    class EnemyManager
-    {
-    public:
-        EnemyManager(UpdateManager& updateManager, RenderManager& renderManager, Player* player);
-        std::vector<Enemy*>& getEnemies();
+	class EnemyManager
+	{
+	public:
+		EnemyManager(UpdateManager& updateManager, RenderManager& renderManager, Player* player);
+		std::vector<Enemy*>& getEnemies();
 
-        void update(float deltaTime, float runTime);
-        void checkBulletCollisions(std::vector<Bullet*>& bullets);
-        void checkPlayerCollision();
-        void checkEnemyBulletCollisions();
+		void update(float deltaTime, float runTime);
+		void checkBulletCollisions(std::vector<Bullet*>& bullets);
+		void checkPlayerCollision();
+		void checkEnemyBulletCollisions();
 
-        std::vector<sf::Vector2f> removeDeadEnemies();
-        void clear();
+		std::vector<sf::Vector2f> removeDeadEnemies();
+		void clear();
 
-    private:
-        void spawnEnemy();
-        void spawnBoss();
-        void updateBossAttacks();
-        void pushEnemyAwayFromPlayer(Enemy* enemy);
+	private:
+		void spawnEnemy();
+		void spawnBoss();
+		void updateBossAttacks();
+		void pushEnemyAwayFromPlayer(Enemy* enemy);
 
-        UpdateManager& updateManager;
-        RenderManager& renderManager;
-        Player* player;
+		UpdateManager& updateManager;
+		RenderManager& renderManager;
+		Player* player;
 
-        std::vector<Enemy*> enemies;
-        std::vector<Bullet*> enemyBullets;
+		std::vector<Enemy*> enemies;
+		std::vector<Bullet*> enemyBullets;
 
-        float spawnTimer = 0.f;
-        float spawnDelay = 1.f;
-        float bossSpawnTime = 10.f;
-        bool bossSpawned = false;
+		float spawnTimer = 0.f;
+		float spawnDelay = 1.f;
+		float bossSpawnTime = 10.f;
+		bool bossSpawned = false;
 
-        Boss* boss = nullptr;
-    };
+		Boss* boss = nullptr;
+	};
 }

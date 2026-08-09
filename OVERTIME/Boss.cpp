@@ -4,14 +4,27 @@
 
 namespace EngineL
 {
-	Boss::Boss(float x, float y, Player* player)
-		: Enemy(x, y, player)
+	Boss::Boss(float x, float y, Player* player, float difficulty)
+		: Enemy(x, y, player, difficulty)
 	{
 		Stats s;
-		s.health = 300;
-		s.maxHealth = 300;
+		if (difficulty == 1) {
+			s.health = 300.f;
+			s.damage = 20.f;
+			s.maxHealth = 300.f;
+		}
+		else {
+			s.health = 300.f * 2 * difficulty;
+			s.damage = 20.f * 2 * difficulty;
+			s.maxHealth = 300.f * 2 * difficulty;
+		}
 		s.speed = 90.f;
-		s.damage = 20.f;
+		if (difficulty == 2)
+			stats.speed *= 1.25f;
+		else if (difficulty == 3)
+			stats.speed *= 1.5f;
+		else if (difficulty == 4)
+			stats.speed *= 2.f;
 		setStats(s);
 	}
 

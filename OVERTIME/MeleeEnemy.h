@@ -3,9 +3,9 @@
 
 namespace EngineL {
 
-	class MeleeEnemy : public Enemy	{
+	class MeleeEnemy : public Enemy {
 
 	public:
-		MeleeEnemy(float x, float y, Player* player);
+		MeleeEnemy(float x, float y, Player* player, float difficulty);
 	};
 }

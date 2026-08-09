@@ -11,7 +11,7 @@ namespace EngineL
 
 	bool Map::isWallTileId(int tileId) const
 	{
-		
+
 		return tileId == 42 || tileId == 13;
 	}
 

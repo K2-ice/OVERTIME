@@ -5,23 +5,23 @@
 
 enum class PauseAction
 {
-    None,
-    Resume,
-    SkillTree,
-    QuitToMenu
+	None,
+	Resume,
+	SkillTree,
+	QuitToMenu
 };
 
 class PauseScreen
 {
 public:
-    PauseScreen(sf::Font& font);
+	PauseScreen(sf::Font& font);
 
-    PauseAction handleInput(EngineL::InputManager& input, const sf::RenderWindow& window);
-    void render(sf::RenderWindow& window);
+	PauseAction handleInput(EngineL::InputManager& input, const sf::RenderWindow& window);
+	void render(sf::RenderWindow& window);
 
 private:
-    void drawButton(sf::RenderWindow& window, const sf::FloatRect& bounds, const std::string& label);
+	void drawButton(sf::RenderWindow& window, const sf::FloatRect& bounds, const std::string& label);
 
-    sf::Font& font;
-    bool mouseHeld = false;
+	sf::Font& font;
+	bool mouseHeld = false;
 };

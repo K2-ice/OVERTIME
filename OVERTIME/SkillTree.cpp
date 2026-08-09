@@ -165,7 +165,7 @@ void SkillTree::Buy(int index, Player& player, WeaponInventory& weaponInventory)
 		break;
 
 	case SkillType::Capacity:
-		weaponInventory.increaseCapacityAll(node.amount, 3* node.amount);
+		weaponInventory.increaseCapacityAll(node.amount, 3 * node.amount);
 		break;
 
 	case SkillType::Difficulty:

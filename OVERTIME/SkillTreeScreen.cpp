@@ -15,15 +15,32 @@ SkillTreeScreen::SkillTreeScreen(sf::Font& font)
 	treeView.setCenter({ 300.f, 100.f });
 }
 
+void SkillTreeScreen::setDuringRun(bool duringRun)
+{
+	this->duringRun = duringRun;
+	pendingNodeIndex = -1;
+}
+
+bool SkillTreeScreen::isDuringRun() const
+{
+	return duringRun;
+}
+
+bool SkillTreeScreen::canAfford(
+	const SkillNode& node,
+	const EngineL::Player& player) const
+{
+	return node.unlocked
+		&& node.level < node.maxLevel
+		&& player.getSouls() >= node.cost;
+}
+
 SkillTreeAction SkillTreeScreen::handleInput(
 	EngineL::InputManager& input,
 	const sf::RenderWindow& window,
 	EngineL::Player& player,
 	WeaponInventory& weaponInventory)
 {
-	// =========================
-	// ZOOM
-	// =========================
 
 	float wheel = input.getMouseWheelDelta();
 
@@ -39,20 +56,11 @@ SkillTreeAction SkillTreeScreen::handleInput(
 		720.f * zoom
 		});
 
-
-	// =========================
-	// MOUSE
-	// =========================
-
 	bool pressed =
 		input.isMouseButtonPressed(sf::Mouse::Button::Left);
 
 	SkillTreeAction action = SkillTreeAction::None;
 
-
-	// =========================
-	// LEFT CLICK START
-	// =========================
 
 	if (pressed && !leftPressed)
 	{
@@ -62,11 +70,6 @@ SkillTreeAction SkillTreeScreen::handleInput(
 		dragStart = input.getMousePosition(window);
 		lastMousePos = dragStart;
 	}
-
-
-	// =========================
-	// DRAGGING
-	// =========================
 
 	if (pressed)
 	{
@@ -79,7 +82,6 @@ SkillTreeAction SkillTreeScreen::handleInput(
 		float dy =
 			static_cast<float>(current.y - dragStart.y);
 
-		// Start dragging after moving 5 pixels
 		if (!dragging &&
 			dx * dx + dy * dy > 25.f)
 		{
@@ -105,34 +107,19 @@ SkillTreeAction SkillTreeScreen::handleInput(
 	}
 
 
-	// =========================
-	// LEFT CLICK RELEASE
-	// =========================
-
 	if (!pressed && leftPressed)
 	{
 		leftPressed = false;
 
-
-		// =========================
-		// ONLY PROCESS CLICK
-		// IF WE DID NOT DRAG
-		// =========================
 
 		if (!dragging)
 		{
 			sf::Vector2i mousePixel =
 				input.getMousePosition(window);
 
-			// UI buttons use screen coordinates
 			sf::Vector2f screenMouse(
 				static_cast<float>(mousePixel.x),
 				static_cast<float>(mousePixel.y));
-
-
-			// =========================
-			// PENDING CONFIRMATION
-			// =========================
 
 			if (pendingNodeIndex != -1)
 			{
@@ -154,10 +141,6 @@ SkillTreeAction SkillTreeScreen::handleInput(
 			}
 
 
-			// =========================
-			// BACK BUTTON
-			// =========================
-
 			else if (
 				duringRun &&
 				kBackButtonBounds.contains(screenMouse))
@@ -165,10 +148,6 @@ SkillTreeAction SkillTreeScreen::handleInput(
 				action = SkillTreeAction::Back;
 			}
 
-
-			// =========================
-			// SKILL NODE CLICK
-			// =========================
 
 			else
 			{
@@ -193,22 +172,16 @@ SkillTreeAction SkillTreeScreen::handleInput(
 					if (dx * dx + dy * dy <=
 						20.f * 20.f)
 					{
-						// Don't allow buying if
-						// the node can't be bought.
 						if (!canAfford(nodes[i], player))
 							break;
 
 						if (duringRun)
 						{
-							// During a run:
-							// ask for confirmation.
 							pendingNodeIndex =
 								static_cast<int>(i);
 						}
 						else
 						{
-							// Outside a run:
-							// buy immediately.
 							skillTree.Buy(
 								static_cast<int>(i),
 								player,
@@ -230,6 +203,8 @@ SkillTreeAction SkillTreeScreen::handleInput(
 
 void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& player)
 {
+	window.setView(window.getDefaultView());
+
 	bool isFrench = Language::current == LanguageOption::French;
 
 	const auto mousePixel = sf::Mouse::getPosition(window);
@@ -419,9 +394,9 @@ void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& pl
 		if (hoveredNode->level < hoveredNode->maxLevel)
 		{
 			info +=
-				"\n\nCost: " +
+				"\n\n" + costPrefix + ": " +
 				std::to_string(hoveredNode->cost) +
-				" Souls";
+				costLabel;
 		}
 		else
 		{
@@ -437,6 +412,7 @@ void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& pl
 		text.setPosition(mouse + sf::Vector2f(35.f, 35.f));
 		window.draw(text);
 	}
+	window.setView(window.getDefaultView());
 
 	if (duringRun)
 	{

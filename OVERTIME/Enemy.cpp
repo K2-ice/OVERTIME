@@ -11,9 +11,16 @@ namespace EngineL
 		this->player = player;
 
 		Stats s;
-		s.health = 30.f * 2 * difficulty;
-		s.damage = 5.f * 2 * difficulty;
-		s.maxHealth = 30 * 2 * difficulty;
+		if (difficulty == 1) {
+			s.health = 30.f;
+			s.damage = 5.f;
+			s.maxHealth = 30.f;
+		}
+		else {
+			s.health = 30.f * 2 * difficulty;
+			s.damage = 5.f * 2 * difficulty;
+			s.maxHealth = 30.f * 2 * difficulty;
+		}
 		s.speed = 150.f;
 		if (difficulty == 2)
 			stats.speed *= 1.25f;

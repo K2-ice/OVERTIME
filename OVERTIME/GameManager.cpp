@@ -168,7 +168,7 @@ void GameManager::update(float deltaTime)
 	enemyManager.checkPlayerCollision();
 	enemyManager.checkEnemyBulletCollisions();
 
-	handleEnemyDeaths();
+	cleanupEnemies();
 	collectSouls();
 	collectWeaponPickups();
 	cleanupBullets();
@@ -216,11 +216,6 @@ void GameManager::handleShooting()
 {
 	EngineL::Weapon* weapon = weaponInventory.getCurrentWeapon();
 
-	if (player.wantsToShoot() && weapon->getCurrentAmmo() <= 0 && !weapon->isReloading())
-	{
-		weapon->startReload();
-	}
-
 	if (player.wantsToShoot())
 	{
 		float x = player.getPosition().x;
@@ -240,26 +235,7 @@ void GameManager::handleShooting()
 	}
 }
 
-void GameManager::spawnEnemy()
-{
-	std::cout << player.GetStats().difficulty << std::endl;
-	sf::Vector2f playerPos = player.getPosition();
 
-	float angle =
-		static_cast<float>(rand()) /
-		static_cast<float>(RAND_MAX) *
-		6.2831853f;
-
-	float x = playerPos.x + std::cos(angle) * 500.f;
-	float y = playerPos.y + std::sin(angle) * 500.f;
-
-	EngineL::Enemy* enemy = new EngineL::Enemy(x, y, &player, player.GetStats().difficulty);
-
-	enemies.push_back(enemy);
-
-	updateManager.add(enemy);
-	renderManager.add(enemy);
-}
 
 void GameManager::cleanupBullets()
 {
@@ -287,101 +263,19 @@ void GameManager::cleanupBullets()
 	}
 }
 
-void GameManager::checkBulletEnemyCollisions()
-{
-	for (int b = 0; b < bullets.size(); b++)
-	{
-		EngineL::Bullet* bullet = bullets[b];
-
-		bool bulletDestroyed = false;
-
-		for (int e = 0; e < enemies.size(); e++)
-		{
-			EngineL::Enemy* enemy = enemies[e];
-
-			if (bullet->getBounds().findIntersection(enemy->getBounds()))
-			{
-				float damage = bullet->getDamage();
-
-				float rollcrit = static_cast<float>(rand()) / RAND_MAX;
-
-				bool isCrit = rollcrit < player.GetStats().critChance;
-
-				if (isCrit)
-				{
-					damage *= (player.GetStats().critDamage);
-
-					if (player.GetStats().health < player.GetStats().maxHealth)
-					{
-						float lifestealAmount = damage * player.GetStats().lifesteal;
-						if (lifestealAmount > player.GetStats().maxHealth - player.GetStats().health)
-						{
-							lifestealAmount = player.GetStats().maxHealth - player.GetStats().health;
-						}
-						player.takeDamage(-static_cast<int>(lifestealAmount));
-					}
-					std::cout << "CRIT! Damage: "
-						<< damage << std::endl;
-				}
-				else
-				{
-					if (player.GetStats().health < player.GetStats().maxHealth)
-					{
-						float lifestealAmount = damage * player.GetStats().lifesteal;
-						if (lifestealAmount > player.GetStats().maxHealth - player.GetStats().health)
-						{
-							lifestealAmount = player.GetStats().maxHealth - player.GetStats().health;
-						}
-						player.takeDamage(-static_cast<int>(lifestealAmount));
-					}
-					std::cout << "Damage: "
-						<< damage << std::endl;
-				}
-
-				enemy->takeDamage(static_cast<int>(damage));
-
-				updateManager.remove(bullet);
-				renderManager.remove(bullet);
-
-				delete bullet;
-
-				bullets.erase(bullets.begin() + b);
-
-				b--;
-
-				bulletDestroyed = true;
-
-				break;
-			}
-		}
-
-		if (bulletDestroyed)
-			continue;
-	}
-}
-
 void GameManager::cleanupEnemies()
 {
-	for (int i = 0; i < enemies.size(); i++)
-	{
-		EngineL::Enemy* enemy = enemies[i];
+	std::vector<sf::Vector2f> deathPositions = enemyManager.removeDeadEnemies();
 
-		if (!enemy->isAlive())
-		{
-			death += 1;
-			EngineL::Soul* soul =
-				new EngineL::Soul(
-					enemy->getPosition().x,
-					enemy->getPosition().y);
+	for (const sf::Vector2f& position : deathPositions)
+	{
+		EngineL::Soul* soul = new EngineL::Soul(position.x, position.y);
 
 		souls.push_back(soul);
 		updateManager.add(soul);
 		renderManager.add(soul);
 
-			EngineL::WeaponPickup* pickup =
-				weaponInventory.tryDropWeapon(
-					enemy->getPosition().x,
-					enemy->getPosition().y, player.GetStats().hasShotgun, player.GetStats().hasSubmachinegun);
+		EngineL::WeaponPickup* pickup = weaponInventory.tryDropWeapon(position.x, position.y, player.GetStats().hasShotgun, player.GetStats().hasSubmachinegun);
 
 		if (pickup != nullptr)
 		{

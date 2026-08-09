@@ -33,7 +33,9 @@ private:
 	void handleShooting();
 	void handleReload();
 	void cleanupBullets();
-	void handleEnemyDeaths();
+	void spawnEnemy(float deltaTime);
+	void cleanupEnemies();
+	void checkBulletEnemyCollisions();
 	void startNewRun();
 	void renderGameScene();
 	void collectSouls();

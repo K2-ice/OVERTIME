@@ -8,7 +8,7 @@ namespace EngineL
 	class Boss : public Enemy
 	{
 	public:
-		Boss(float x, float y, Player* player);
+		Boss(float x, float y, Player* player, float difficulty);
 
 		void update(float deltaTime) override;
 

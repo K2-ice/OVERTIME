@@ -3,9 +3,9 @@
 
 namespace EngineL
 {
-    class CollisionManager
-    {
-    public:
-        static bool checkCollision(const Entity* a, const Entity* b);
-    };
+	class CollisionManager
+	{
+	public:
+		static bool checkCollision(const Entity* a, const Entity* b);
+	};
 }

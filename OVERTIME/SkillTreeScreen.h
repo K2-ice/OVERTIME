@@ -20,7 +20,12 @@ public:
 	void setDuringRun(bool duringRun);
 	bool isDuringRun() const;
 
-	void handleInput(EngineL::InputManager& input, const sf::RenderWindow& window, EngineL::Player& player, WeaponInventory& weaponinventory);
+	SkillTreeAction handleInput(
+		EngineL::InputManager& input,
+		const sf::RenderWindow& window,
+		EngineL::Player& player,
+		WeaponInventory& weaponInventory
+	);
 	void render(sf::RenderWindow& window, const EngineL::Player& player);
 
 private:
