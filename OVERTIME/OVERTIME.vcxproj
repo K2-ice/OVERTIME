@@ -162,12 +162,24 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BelierEnemy.cpp" />
+    <ClCompile Include="Boss.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyManager.cpp" />
     <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="GameOverScreen.cpp" />
     <ClCompile Include="HUD.cpp" />
+    <ClCompile Include="KamikazeEnemy.cpp" />
+    <ClCompile Include="Language.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MainMenuScreen.cpp" />
+    <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MeleeEnemy.cpp" />
+    <ClCompile Include="PauseScreen.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SaveSystem.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="SettingsScreen.cpp" />
     <ClCompile Include="SkillTree.cpp" />
     <ClCompile Include="SkillTreeScreen.cpp" />
     <ClCompile Include="Soul.cpp" />
@@ -180,11 +192,23 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BelierEnemy.h" />
+    <ClInclude Include="Boss.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyManager.h" />
     <ClInclude Include="GameManager.h" />
+    <ClInclude Include="GameOverScreen.h" />
     <ClInclude Include="HUD.h" />
+    <ClInclude Include="KamikazeEnemy.h" />
+    <ClInclude Include="Language.h" />
+    <ClInclude Include="MainMenuScreen.h" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="MeleeEnemy.h" />
+    <ClInclude Include="PauseScreen.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="SaveSystem.h" />
+    <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="SettingsScreen.h" />
     <ClInclude Include="SkillNode.h" />
     <ClInclude Include="SkillTree.h" />
     <ClInclude Include="SkillTreeScreen.h" />

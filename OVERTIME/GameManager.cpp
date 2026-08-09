@@ -1,13 +1,16 @@
 #include "pch.h"
 #include "GameManager.h"
+#include "SaveSystem.h"
+
 #include <cmath>
 #include <cstdlib>
 
 GameManager::GameManager()
 	: engine(1280, 720, "OVERTIME")
-	, player(400.f, 300.f, &engine.getInputManager())
+	, player(400.f, 300.f, &engine.getInputManager(), &map)
+	, enemyManager(updateManager, renderManager, &player)
 	, hud(font)
-	, skillTreeScreen(font)
+	, sceneManager(font)
 {
 	updateManager.add(&player);
 	renderManager.add(&player);
@@ -17,23 +20,51 @@ GameManager::GameManager()
 	if (!font.openFromFile("Assets/arial.ttf"))
 		throw std::runtime_error("Failed to load font.");
 
-	player.addSouls(50000);
+	savedSouls = SaveSystem::load();
+	sceneManager.getMainMenuScreen().setSavedSouls(savedSouls);
+
+	int layout[EngineL::Map::height][EngineL::Map::width];
+
+	for (int y = 0; y < EngineL::Map::height; y++)
+	{
+		for (int x = 0; x < EngineL::Map::width; x++)
+		{
+			bool border = (x == 0 || y == 0 || x == EngineL::Map::width - 1 || y == EngineL::Map::height - 1);
+
+			if (border)
+			{
+				layout[y][x] = 42; // mur
+			}
+			else
+			{
+				// sol en herbe, avec un peu de variete (1,2,3,4)
+				int variant = (x + y) % 4;
+				layout[y][x] = 1 + variant;
+			}
+		}
+	}
+
+	// Quelques murs interieurs pour tester la collision
+	layout[5][10] = 42;
+	layout[5][11] = 42;
+	layout[5][12] = 42;
+	layout[10][20] = 42;
+	layout[10][21] = 42;
+	layout[15][5] = 42;
+	layout[15][6] = 42;
+
+	map.load(layout, "Assets/Tiles/");
 }
 
 GameManager::~GameManager()
 {
+	SaveSystem::save(player.getSouls());
+
 	for (auto bullet : bullets)
 	{
 		updateManager.remove(bullet);
 		renderManager.remove(bullet);
 		delete bullet;
-	}
-
-	for (auto enemy : enemies)
-	{
-		updateManager.remove(enemy);
-		renderManager.remove(enemy);
-		delete enemy;
 	}
 
 	for (auto soul : souls)
@@ -49,6 +80,8 @@ GameManager::~GameManager()
 		renderManager.remove(pickup);
 		delete pickup;
 	}
+
+	enemyManager.clear();
 }
 
 void GameManager::run()
@@ -64,20 +97,41 @@ void GameManager::run()
 	}
 }
 
+sf::View GameManager::getGameView()
+{
+	sf::View view(engine.getWindow().getRenderWindow().getDefaultView());
+	sf::Vector2f playerCenter = player.getPosition() + sf::Vector2f(16.f, 16.f);
+	view.setCenter(playerCenter);
+	return view;
+}
+
 void GameManager::update(float deltaTime)
 {
-	if (showSkillTree)
+	if (sceneManager.getState() != GameState::Playing)
 	{
-		skillTreeScreen.handleInput(
+		bool startRun = sceneManager.updateMenus(
 			engine.getInputManager(),
 			engine.getWindow().getRenderWindow(),
 			player, weaponInventory);
 
-		if (engine.getInputManager().isStartPressed())
+		if (startRun)
 		{
+			if (sceneManager.consumeContinueRequested())
+			{
+				player.addSouls(savedSouls);
+			}
+
 			startNewRun();
 		}
 
+		return;
+	}
+
+	// etat "Playing"
+
+	if (engine.getInputManager().isPausePressed())
+	{
+		sceneManager.setState(GameState::Paused);
 		return;
 	}
 
@@ -85,26 +139,22 @@ void GameManager::update(float deltaTime)
 		engine.getInputManager().getMousePosition(
 			engine.getWindow().getRenderWindow());
 
-	player.aimAt(
-		static_cast<float>(mouse.x),
-		static_cast<float>(mouse.y));
+	sf::Vector2f worldMouse =
+		engine.getWindow().getRenderWindow().mapPixelToCoords(mouse, getGameView());
+
+	player.aimAt(worldMouse.x, worldMouse.y);
 
 	runTime += deltaTime;
 
 	if (runTime >= maxRunTime)
 	{
-		std::cout << death << std::endl;
+		sceneManager.getSkillTreeScreen().setDuringRun(false);
+		sceneManager.setState(GameState::SkillTree);
 		showSkillTree = true;
 		return;
 	}
 
-	spawnTimer += deltaTime;
-
-	if (spawnTimer >= spawnDelay)
-	{
-		spawnTimer = 0.f;
-		spawnEnemy();
-	}
+	enemyManager.update(deltaTime, runTime);
 
 	weaponInventory.handleSwitch(engine.getInputManager(), player.hasSecondWeaponSlot());
 	handleReload();
@@ -114,23 +164,43 @@ void GameManager::update(float deltaTime)
 
 	updateManager.updateAll(deltaTime);
 
-	checkBulletEnemyCollisions();
-	checkEnemyPlayerCollisions();
-	cleanupEnemies();
+	enemyManager.checkBulletCollisions(bullets);
+	enemyManager.checkPlayerCollision();
+	enemyManager.checkEnemyBulletCollisions();
+
+	handleEnemyDeaths();
 	collectSouls();
 	collectWeaponPickups();
 	cleanupBullets();
+
+	if (player.GetStats().health <= 0)
+	{
+		sceneManager.setState(GameState::GameOver);
+	}
 }
 
 void GameManager::render()
 {
-	if (showSkillTree)
+	if (sceneManager.getState() == GameState::Playing)
 	{
-		skillTreeScreen.render(engine.getWindow().getRenderWindow(), player);
+		renderGameScene();
+	}
+	else if (sceneManager.getState() == GameState::Paused)
+	{
+		renderGameScene();
+		sceneManager.renderCurrentMenu(
+			engine.getWindow().getRenderWindow(),
+			engine.getInputManager(),
+			player,
+			runTime);
 	}
 	else
 	{
-		renderGameScene();
+		sceneManager.renderCurrentMenu(
+			engine.getWindow().getRenderWindow(),
+			engine.getInputManager(),
+			player,
+			runTime);
 	}
 }
 
@@ -144,6 +214,13 @@ void GameManager::handleReload()
 
 void GameManager::handleShooting()
 {
+	EngineL::Weapon* weapon = weaponInventory.getCurrentWeapon();
+
+	if (player.wantsToShoot() && weapon->getCurrentAmmo() <= 0 && !weapon->isReloading())
+	{
+		weapon->startReload();
+	}
+
 	if (player.wantsToShoot())
 	{
 		float x = player.getPosition().x;
@@ -186,6 +263,9 @@ void GameManager::spawnEnemy()
 
 void GameManager::cleanupBullets()
 {
+	float mapPixelWidth = static_cast<float>(EngineL::Map::width * EngineL::Map::tileSize);
+	float mapPixelHeight = static_cast<float>(EngineL::Map::height * EngineL::Map::tileSize);
+
 	for (int i = 0; i < bullets.size(); i++)
 	{
 		EngineL::Bullet* bullet = bullets[i];
@@ -193,7 +273,7 @@ void GameManager::cleanupBullets()
 		float x = bullet->getPosition().x;
 		float y = bullet->getPosition().y;
 
-		bool outOfScreen = x < 0.f || x > 1280.f || y < 0.f || y > 720.f;
+		bool outOfScreen = x < 0.f || x > mapPixelWidth || y < 0.f || y > mapPixelHeight;
 
 		if (outOfScreen)
 		{
@@ -294,31 +374,20 @@ void GameManager::cleanupEnemies()
 					enemy->getPosition().x,
 					enemy->getPosition().y);
 
-			souls.push_back(soul);
-
-			updateManager.add(soul);
-			renderManager.add(soul);
+		souls.push_back(soul);
+		updateManager.add(soul);
+		renderManager.add(soul);
 
 			EngineL::WeaponPickup* pickup =
 				weaponInventory.tryDropWeapon(
 					enemy->getPosition().x,
 					enemy->getPosition().y, player.GetStats().hasShotgun, player.GetStats().hasSubmachinegun);
 
-			if (pickup != nullptr)
-			{
-				weaponPickups.push_back(pickup);
-				updateManager.add(pickup);
-				renderManager.add(pickup);
-			}
-
-			updateManager.remove(enemy);
-			renderManager.remove(enemy);
-
-			delete enemy;
-
-			enemies.erase(enemies.begin() + i);
-
-			i--;
+		if (pickup != nullptr)
+		{
+			weaponPickups.push_back(pickup);
+			updateManager.add(pickup);
+			renderManager.add(pickup);
 		}
 	}
 }
@@ -329,7 +398,7 @@ void GameManager::collectSouls()
 	{
 		EngineL::Soul* soul = souls[i];
 
-		if (player.getBounds().findIntersection(soul->getBounds()))
+		if (EngineL::CollisionManager::checkCollision(&player, soul))
 		{
 			player.addSouls(soul->getValue() * player.GetStats().difficulty);
 
@@ -339,7 +408,6 @@ void GameManager::collectSouls()
 			delete soul;
 
 			souls.erase(souls.begin() + i);
-
 			i--;
 		}
 	}
@@ -351,7 +419,7 @@ void GameManager::collectWeaponPickups()
 	{
 		EngineL::WeaponPickup* pickup = weaponPickups[i];
 
-		if (player.getBounds().findIntersection(pickup->getBounds()))
+		if (EngineL::CollisionManager::checkCollision(&player, pickup))
 		{
 			EngineL::Weapon* weapon = weaponInventory.getWeaponById(pickup->getWeaponId());
 
@@ -366,25 +434,7 @@ void GameManager::collectWeaponPickups()
 			delete pickup;
 
 			weaponPickups.erase(weaponPickups.begin() + i);
-
 			i--;
-		}
-	}
-}
-
-void GameManager::checkEnemyPlayerCollisions()
-{
-	for (EngineL::Enemy* enemy : enemies)
-	{
-		if (enemy->getBounds().findIntersection(player.getBounds()))
-		{
-			if (player.canTakeDamage())
-			{
-				player.takeDamage(
-					static_cast<int>(enemy->GetStats().damage));
-
-				player.resetDamageCooldown();
-			}
 		}
 	}
 }
@@ -395,7 +445,6 @@ void GameManager::startNewRun()
 	showSkillTree = false;
 	maxRunTime = player.getMaxTime();
 	runTime = 0.f;
-	spawnTimer = 0.f;
 
 	player.setPosition(400.f, 300.f);
 	player.resetDamageCooldown();
@@ -415,14 +464,6 @@ void GameManager::startNewRun()
 	}
 	bullets.clear();
 
-	for (auto enemy : enemies)
-	{
-		updateManager.remove(enemy);
-		renderManager.remove(enemy);
-		delete enemy;
-	}
-	enemies.clear();
-
 	for (auto soul : souls)
 	{
 		updateManager.remove(soul);
@@ -438,14 +479,24 @@ void GameManager::startNewRun()
 		delete pickup;
 	}
 	weaponPickups.clear();
+
+	enemyManager.clear();
 }
 
 void GameManager::renderGameScene()
 {
+	sf::RenderWindow& window = engine.getWindow().getRenderWindow();
+
+	sf::View gameView = getGameView();
+	window.setView(gameView);
+
+	map.render(engine.getRenderer());
 	renderManager.renderAll(engine.getRenderer());
 
+	window.setView(window.getDefaultView());
+
 	hud.draw(
-		engine.getWindow().getRenderWindow(),
+		window,
 		player,
 		weaponInventory.getCurrentWeapon(),
 		runTime,

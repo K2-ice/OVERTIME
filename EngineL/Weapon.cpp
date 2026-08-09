@@ -114,6 +114,9 @@ namespace EngineL
 		currentAmmo = magazineSize;
 		if (!infiniteReserve)
 			reserveAmmo = maxReserveAmmo;
+		reloading = false;
+		reloadTimer = 0.f;
+		cooldown = 0.f;
 	};
 	bool Weapon::isReloading() const
 	{

@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <string>
-
 #include "Bullet.h"
 #include "WeaponStats.h"
 
@@ -20,6 +19,7 @@ namespace EngineL
 		void startReload(float reloadspeed);
 		void resetAmmo();
 		bool isReloading() const;
+		void resetAmmo();
 
 		std::string getName() const;
 		int getCurrentAmmo() const;

@@ -3,6 +3,12 @@
 
 namespace EngineL
 {
+	enum class KeyLayout
+	{
+		AZERTY,
+		QWERTY
+	};
+
 	class InputManager
 	{
 	public:
@@ -23,6 +29,9 @@ namespace EngineL
 		bool isReloadPressed() const;
 		void handleEvent(const sf::Event& event);
 
+		void setKeyLayout(KeyLayout layout);
+		KeyLayout getKeyLayout() const;
+
 		float getMouseWheelDelta() const;
 		void beginFrame();
 	private:
@@ -34,5 +43,7 @@ namespace EngineL
 
 		bool currentMouseButtons[MouseButtonCount];
 		float mouseWheelDelta = 0.f;
+
+		KeyLayout keyLayout = KeyLayout::AZERTY;
 	};
 }

@@ -1,14 +1,13 @@
 #include "pch.h"
 #include "Player.h"
-
 #include <cmath>
-
 namespace EngineL
 {
-	Player::Player(float x, float y, InputManager* inputManager)
+	Player::Player(float x, float y, InputManager* inputManager, Map* map)
 		: Entity(x, y, 32.f, 32.f, sf::Color::Blue)
 	{
 		this->inputManager = inputManager;
+		this->map = map;
 		Stats s;
 		s.health = 100;
 		s.maxHealth = 100;
@@ -22,40 +21,53 @@ namespace EngineL
 		s.regen = 0.f;
 		s.difficulty = 1;
 		setStats(s);
+		setTexture("Assets/Characters/Survivor 1/survivor1_stand.png");
 	}
-
 	void Player::update(float deltaTime)
 	{
 		float dx = 0.f;
 		float dy = 0.f;
-
 		if (inputManager->isMovingUp())
 			dy -= 1.f;
-
 		if (inputManager->isMovingDown())
 			dy += 1.f;
-
 		if (inputManager->isMovingLeft())
 			dx -= 1.f;
-
 		if (inputManager->isMovingRight())
 			dx += 1.f;
-
 		float length = std::sqrt(dx * dx + dy * dy);
-
 		if (length > 0.f)
 		{
 			dx /= length;
 			dy /= length;
 		}
 
-		move(dx * GetStats().speed * deltaTime,
-			dy * GetStats().speed * deltaTime);
+		float speed = GetStats().speed;
+		float moveX = dx * speed * deltaTime;
+		float moveY = dy * speed * deltaTime;
+
+		float playerWidth = 32.f;
+		float playerHeight = 32.f;
+
+		// Deplacement horizontal (avec collision mur)
+		sf::Vector2f position = getPosition();
+		float newX = position.x + moveX;
+		if (map == nullptr || !map->isWallArea(newX, position.y, playerWidth, playerHeight))
+		{
+			setPosition(newX, position.y);
+		}
+
+		// Deplacement vertical (avec collision mur)
+		position = getPosition();
+		float newY = position.y + moveY;
+		if (map == nullptr || !map->isWallArea(position.x, newY, playerWidth, playerHeight))
+		{
+			setPosition(position.x, newY);
+		}
 
 		if (damageCooldown > 0.f)
 		{
 			damageCooldown -= deltaTime;
-
 			if (damageCooldown < 0.f)
 				damageCooldown = 0.f;
 		}
@@ -87,68 +99,54 @@ namespace EngineL
 	{
 		float playerX = getPosition().x;
 		float playerY = getPosition().y;
-
 		float dirX = mouseX - playerX;
 		float dirY = mouseY - playerY;
-
 		float length = std::sqrt(dirX * dirX + dirY * dirY);
-
 		if (length > 0.f)
 		{
 			shootDirectionX = dirX / length;
 			shootDirectionY = dirY / length;
 		}
 	}
-
 	bool Player::wantsToShoot() const
 	{
 		return inputManager->isMouseButtonPressed(sf::Mouse::Button::Left);
 	}
-
 	bool Player::canTakeDamage() const
 	{
 		return damageCooldown <= 0.f;
 	}
-
 	void Player::resetDamageCooldown()
 	{
 		damageCooldown = damageCooldownMax;
 	}
-
 	float Player::getShootDirectionX() const
 	{
 		return shootDirectionX;
 	}
-
 	float Player::getShootDirectionY() const
 	{
 		return shootDirectionY;
 	}
-
 	int Player::getSouls() const
 	{
 		return souls;
 	}
-
 	void Player::addSouls(int amount)
 	{
 		souls += amount;
 	}
-
 	bool Player::spendSouls(int amount)
 	{
 		if (souls < amount)
 			return false;
-
 		souls -= amount;
 		return true;
 	}
-
 	bool Player::hasSecondWeaponSlot() const
 	{
 		return secondWeaponSlotUnlocked;
 	}
-
 	void Player::unlockSecondWeaponSlot()
 	{
 		secondWeaponSlotUnlocked = true;

@@ -60,6 +60,9 @@
     <ClInclude Include="Window.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="CollisionManager.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EngineL.cpp">
@@ -99,6 +102,9 @@
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="WeaponPickup.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionManager.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
