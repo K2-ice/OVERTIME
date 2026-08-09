@@ -7,7 +7,7 @@
 
 GameManager::GameManager()
 	: engine(1280, 720, "OVERTIME")
-	, player(400.f, 300.f, &engine.getInputManager())
+	, player(400.f, 300.f, &engine.getInputManager(), &map)
 	, enemyManager(updateManager, renderManager, &player)
 	, hud(font)
 	, sceneManager(font)
@@ -22,6 +22,38 @@ GameManager::GameManager()
 
 	savedSouls = SaveSystem::load();
 	sceneManager.getMainMenuScreen().setSavedSouls(savedSouls);
+
+	int layout[EngineL::Map::height][EngineL::Map::width];
+
+	for (int y = 0; y < EngineL::Map::height; y++)
+	{
+		for (int x = 0; x < EngineL::Map::width; x++)
+		{
+			bool border = (x == 0 || y == 0 || x == EngineL::Map::width - 1 || y == EngineL::Map::height - 1);
+
+			if (border)
+			{
+				layout[y][x] = 42; // mur
+			}
+			else
+			{
+				// sol en herbe, avec un peu de variete (1,2,3,4)
+				int variant = (x + y) % 4;
+				layout[y][x] = 1 + variant;
+			}
+		}
+	}
+
+	// Quelques murs interieurs pour tester la collision
+	layout[5][10] = 42;
+	layout[5][11] = 42;
+	layout[5][12] = 42;
+	layout[10][20] = 42;
+	layout[10][21] = 42;
+	layout[15][5] = 42;
+	layout[15][6] = 42;
+
+	map.load(layout, "Assets/Tiles/");
 }
 
 GameManager::~GameManager()
@@ -65,6 +97,14 @@ void GameManager::run()
 	}
 }
 
+sf::View GameManager::getGameView()
+{
+	sf::View view(engine.getWindow().getRenderWindow().getDefaultView());
+	sf::Vector2f playerCenter = player.getPosition() + sf::Vector2f(16.f, 16.f);
+	view.setCenter(playerCenter);
+	return view;
+}
+
 void GameManager::update(float deltaTime)
 {
 	if (sceneManager.getState() != GameState::Playing)
@@ -99,9 +139,10 @@ void GameManager::update(float deltaTime)
 		engine.getInputManager().getMousePosition(
 			engine.getWindow().getRenderWindow());
 
-	player.aimAt(
-		static_cast<float>(mouse.x),
-		static_cast<float>(mouse.y));
+	sf::Vector2f worldMouse =
+		engine.getWindow().getRenderWindow().mapPixelToCoords(mouse, getGameView());
+
+	player.aimAt(worldMouse.x, worldMouse.y);
 
 	runTime += deltaTime;
 
@@ -172,6 +213,13 @@ void GameManager::handleReload()
 
 void GameManager::handleShooting()
 {
+	EngineL::Weapon* weapon = weaponInventory.getCurrentWeapon();
+
+	if (player.wantsToShoot() && weapon->getCurrentAmmo() <= 0 && !weapon->isReloading())
+	{
+		weapon->startReload();
+	}
+
 	if (player.wantsToShoot())
 	{
 		float x = player.getPosition().x;
@@ -180,7 +228,7 @@ void GameManager::handleShooting()
 		float dirY = player.getShootDirectionY();
 
 		std::vector<EngineL::Bullet*> newBullets =
-			weaponInventory.getCurrentWeapon()->fire(x, y, dirX, dirY);
+			weapon->fire(x, y, dirX, dirY);
 
 		for (EngineL::Bullet* bullet : newBullets)
 		{
@@ -193,6 +241,9 @@ void GameManager::handleShooting()
 
 void GameManager::cleanupBullets()
 {
+	float mapPixelWidth = static_cast<float>(EngineL::Map::width * EngineL::Map::tileSize);
+	float mapPixelHeight = static_cast<float>(EngineL::Map::height * EngineL::Map::tileSize);
+
 	for (int i = 0; i < bullets.size(); i++)
 	{
 		EngineL::Bullet* bullet = bullets[i];
@@ -200,7 +251,7 @@ void GameManager::cleanupBullets()
 		float x = bullet->getPosition().x;
 		float y = bullet->getPosition().y;
 
-		bool outOfScreen = x < 0.f || x > 1280.f || y < 0.f || y > 720.f;
+		bool outOfScreen = x < 0.f || x > mapPixelWidth || y < 0.f || y > mapPixelHeight;
 
 		if (outOfScreen)
 		{
@@ -324,10 +375,18 @@ void GameManager::startNewRun()
 
 void GameManager::renderGameScene()
 {
+	sf::RenderWindow& window = engine.getWindow().getRenderWindow();
+
+	sf::View gameView = getGameView();
+	window.setView(gameView);
+
+	map.render(engine.getRenderer());
 	renderManager.renderAll(engine.getRenderer());
 
+	window.setView(window.getDefaultView());
+
 	hud.draw(
-		engine.getWindow().getRenderWindow(),
+		window,
 		player,
 		weaponInventory.getCurrentWeapon(),
 		runTime,

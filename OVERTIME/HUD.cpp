@@ -5,6 +5,7 @@
 #include <iomanip>
 
 std::string translateWeaponName(const std::string& name, bool isFrench) {
+   
     if (isFrench)
         return name;
 
@@ -14,7 +15,7 @@ std::string translateWeaponName(const std::string& name, bool isFrench) {
     if (name == "Mitraillette")
         return "SMG";
 
-    if (name == "Shotgun")
+    if (name == "Fusil à Pompe")
         return "Shotgun";
 
     return name;
@@ -99,7 +100,7 @@ void HUD::draw( sf::RenderWindow& window, EngineL::Player& player,EngineL::Weapo
 
     std::string switchHint = hasSecondWeaponSlot ? "  [1/2, R]" : "  [R]";
 
-    text.setString((isFrench ? "Arme : " : "Weapon: ") + weapon->getName() + "  (" + ammoText + ")" + switchHint);
+    text.setString((isFrench ? "Arme : " : "Weapon: ") + translateWeaponName(weapon->getName(), isFrench) + "  (" + ammoText + ")" + switchHint);
 
     text.setPosition({ 10.f, 60.f });
 

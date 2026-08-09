@@ -16,6 +16,7 @@ namespace EngineL
 		s.speed = 150.f;
 		s.damage = 7.f;
 		setStats(s);
+		setTexture("Assets/Characters/Zombie 1/zoimbie1_stand.png");
 	}
 
 	void Enemy::update(float deltaTime)

@@ -12,6 +12,7 @@ namespace EngineL
 		s.speed = 260.f;
 		s.damage = 20.f;
 		setStats(s);
+		setTexture("Assets/Characters/Robot 1/robot1_stand.png");
 
 		shape.setFillColor(sf::Color(255, 140, 0));
 	}

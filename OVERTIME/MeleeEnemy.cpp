@@ -12,6 +12,7 @@ namespace EngineL
 		s.speed = 110.f;
 		s.damage = 12.f;
 		setStats(s);
+		setTexture("Assets/Characters/Zombie 2/zombie2_stand.png");
 
 		shape.setFillColor(sf::Color(150, 0, 150));
 	}

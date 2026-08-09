@@ -13,6 +13,7 @@ namespace EngineL
 		s.speed = 200.f;
 		s.damage = 15.f;
 		setStats(s);
+		setTexture("Assets/Characters/Hitman 1/hitman1_stand.png");
 
 		shape.setFillColor(sf::Color(255, 215, 0));
 
