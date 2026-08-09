@@ -26,13 +26,10 @@ namespace EngineL
 
 		if (inputManager->isMovingUp())
 			dy -= 1.f;
-
 		if (inputManager->isMovingDown())
 			dy += 1.f;
-
 		if (inputManager->isMovingLeft())
 			dx -= 1.f;
-
 		if (inputManager->isMovingRight())
 			dx += 1.f;
 
@@ -46,6 +43,35 @@ namespace EngineL
 
 		move(dx * GetStats().speed * deltaTime,
 			dy * GetStats().speed * deltaTime);
+
+		//  sortie d'écran
+		sf::Vector2f position = getPosition();
+
+		float playerWidth = 32.f;
+		float playerHeight = 32.f;
+
+		float screenWidth = 1280.f;
+		float screenHeight = 720.f;
+
+		if (position.x < 0.f)
+		{
+			setPosition(0.f, position.y);
+		}
+
+		if (position.y < 0.f)
+		{
+			setPosition(position.x, 0.f);
+		}
+
+		if (position.x + playerWidth > screenWidth)
+		{
+			setPosition(screenWidth - playerWidth, position.y);
+		}
+
+		if (position.y + playerHeight > screenHeight)
+		{
+			setPosition(position.x, screenHeight - playerHeight);
+		}
 
 		if (damageCooldown > 0.f)
 		{

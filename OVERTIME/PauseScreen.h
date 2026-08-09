@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "InputManager.h"
+#include "Language.h"
 
 enum class PauseAction
 {

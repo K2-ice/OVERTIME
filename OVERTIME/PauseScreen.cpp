@@ -44,6 +44,8 @@ PauseAction PauseScreen::handleInput(EngineL::InputManager& input, const sf::Ren
 
 void PauseScreen::render(sf::RenderWindow& window)
 {
+    bool isFrench = Language::current == LanguageOption::French;
+
     sf::RectangleShape overlay;
     overlay.setSize({ static_cast<float>(window.getSize().x), static_cast<float>(window.getSize().y) });
     overlay.setFillColor(sf::Color(0, 0, 0, 160));
@@ -52,7 +54,7 @@ void PauseScreen::render(sf::RenderWindow& window)
     sf::Text title(font);
     title.setCharacterSize(50);
     title.setFillColor(sf::Color::White);
-    title.setString("Pause");
+    title.setString(isFrench ? "Pause" : "Paused");
 
     sf::FloatRect titleBounds = title.getLocalBounds();
     title.setPosition({
@@ -61,9 +63,9 @@ void PauseScreen::render(sf::RenderWindow& window)
         });
     window.draw(title);
 
-    drawButton(window, kResumeButtonBounds, "Reprendre");
-    drawButton(window, kSkillTreeButtonBounds, "Arbre de competences");
-    drawButton(window, kQuitButtonBounds, "Menu principal");
+    drawButton(window, kResumeButtonBounds, isFrench ? "Reprendre" : "Resume");
+    drawButton(window, kSkillTreeButtonBounds, isFrench ? "Arbre de competences" : "Skill tree");
+    drawButton(window, kQuitButtonBounds, isFrench ? "Menu principal" : "Main menu");
 }
 
 void PauseScreen::drawButton(sf::RenderWindow& window, const sf::FloatRect& bounds, const std::string& label)

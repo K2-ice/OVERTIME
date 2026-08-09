@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+
 #include "GameEngine.h"
 #include "Player.h"
 #include "Bullet.h"
@@ -13,6 +14,8 @@
 #include "RenderManager.h"
 #include "SceneManager.h"
 #include "HUD.h"
+#include "SaveSystem.h"
+
 #include <SFML/Graphics/Font.hpp>
 
 class GameManager
@@ -55,6 +58,7 @@ private:
 
 	float runTime = 0.f;
 	float maxRunTime = 10.f;
+	int	savedSouls = 0;
 
 	sf::Font font;
 	HUD hud;

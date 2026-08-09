@@ -18,7 +18,6 @@ namespace EngineL
 
 		void startReload();
 		bool isReloading() const;
-
 		void resetAmmo();
 
 		std::string getName() const;

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "EnemyManager.h"
+
 #include <cmath>
 #include <cstdlib>
 
@@ -17,7 +18,7 @@ namespace EngineL
         return enemies;
     }
 
-    void EnemyManager::update(float deltaTime)
+    void EnemyManager::update(float deltaTime, float runTime)
     {
         spawnTimer += deltaTime;
 
@@ -26,6 +27,13 @@ namespace EngineL
             spawnTimer = 0.f;
             spawnEnemy();
         }
+
+        if (!bossSpawned && runTime >= bossSpawnTime)
+        {
+            spawnBoss();
+        }
+
+        updateBossAttacks();
     }
 
     void EnemyManager::spawnEnemy()
@@ -64,6 +72,43 @@ namespace EngineL
         renderManager.add(enemy);
     }
 
+    void EnemyManager::spawnBoss()
+    {
+        bossSpawned = true;
+
+        sf::Vector2f playerPosition = player->getPosition();
+
+        float angle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 6.2831853f;
+
+        float x = playerPosition.x + std::cos(angle) * 500.f;
+        float y = playerPosition.y + std::sin(angle) * 500.f;
+
+        boss = new Boss(x, y, player);
+
+        enemies.push_back(boss);
+
+        updateManager.add(boss);
+        renderManager.add(boss);
+    }
+
+    void EnemyManager::updateBossAttacks()
+    {
+        if (boss == nullptr || !boss->isAlive())
+            return;
+
+        if (boss->wantsToFire())
+        {
+            std::vector<Bullet*> newBullets = boss->fire();
+
+            for (Bullet* bullet : newBullets)
+            {
+                enemyBullets.push_back(bullet);
+                updateManager.add(bullet);
+                renderManager.add(bullet);
+            }
+        }
+    }
+
     void EnemyManager::checkBulletCollisions(std::vector<Bullet*>& bullets)
     {
         for (int b = 0; b < bullets.size(); b++)
@@ -95,6 +140,31 @@ namespace EngineL
 
             if (bulletDestroyed)
                 continue;
+        }
+    }
+
+    void EnemyManager::checkEnemyBulletCollisions()
+    {
+        for (int b = 0; b < enemyBullets.size(); b++)
+        {
+            Bullet* bullet = enemyBullets[b];
+
+            if (CollisionManager::checkCollision(bullet, player))
+            {
+                if (player->canTakeDamage())
+                {
+                    player->takeDamage(static_cast<int>(bullet->getDamage()));
+                    player->resetDamageCooldown();
+                }
+
+                updateManager.remove(bullet);
+                renderManager.remove(bullet);
+
+                delete bullet;
+
+                enemyBullets.erase(enemyBullets.begin() + b);
+                b--;
+            }
         }
     }
 
@@ -159,6 +229,9 @@ namespace EngineL
             {
                 deathPositions.push_back(enemy->getPosition());
 
+                if (enemy == boss)
+                    boss = nullptr;
+
                 updateManager.remove(enemy);
                 renderManager.remove(enemy);
 
@@ -182,5 +255,17 @@ namespace EngineL
         }
 
         enemies.clear();
+
+        for (Bullet* bullet : enemyBullets)
+        {
+            updateManager.remove(bullet);
+            renderManager.remove(bullet);
+            delete bullet;
+        }
+
+        enemyBullets.clear();
+
+        boss = nullptr;
+        bossSpawned = false;
     }
 }

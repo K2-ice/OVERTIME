@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "GameManager.h"
+#include "SaveSystem.h"
 
 #include <cmath>
 #include <cstdlib>
@@ -19,11 +20,14 @@ GameManager::GameManager()
 	if (!font.openFromFile("Assets/arial.ttf"))
 		throw std::runtime_error("Failed to load font.");
 
-	player.addSouls(50);
+	savedSouls = SaveSystem::load();
+	sceneManager.getMainMenuScreen().setSavedSouls(savedSouls);
 }
 
 GameManager::~GameManager()
 {
+	SaveSystem::save(player.getSouls());
+
 	for (auto bullet : bullets)
 	{
 		updateManager.remove(bullet);
@@ -72,6 +76,11 @@ void GameManager::update(float deltaTime)
 
 		if (startRun)
 		{
+			if (sceneManager.consumeContinueRequested())
+			{
+				player.addSouls(savedSouls);
+			}
+
 			startNewRun();
 		}
 
@@ -103,7 +112,7 @@ void GameManager::update(float deltaTime)
 		return;
 	}
 
-	enemyManager.update(deltaTime);
+	enemyManager.update(deltaTime, runTime);
 
 	weaponInventory.handleSwitch(engine.getInputManager(), player.hasSecondWeaponSlot());
 	handleReload();
@@ -115,6 +124,7 @@ void GameManager::update(float deltaTime)
 
 	enemyManager.checkBulletCollisions(bullets);
 	enemyManager.checkPlayerCollision();
+	enemyManager.checkEnemyBulletCollisions();
 
 	handleEnemyDeaths();
 	collectSouls();

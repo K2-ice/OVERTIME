@@ -15,44 +15,36 @@ namespace EngineL
 		setStats(s);
 
 		shape.setFillColor(sf::Color(255, 215, 0));
+
+		retarget();
 	}
 
-	void BelierEnemy::update(float deltaTime)
+	void BelierEnemy::retarget()
 	{
-		if (isCharging)
-		{
-			// --- Etat 2 : en pleine charge ---
-			move(chargeDirX * GetStats().speed * chargeSpeedMultiplier * deltaTime,
-				chargeDirY * GetStats().speed * chargeSpeedMultiplier * deltaTime);
-
-			chargeTimer -= deltaTime;
-
-			if (chargeTimer <= 0.f)
-			{
-				isCharging = false;
-			}
-
-			return;
-		}
-
-		// --- Etat 1 : poursuite normale ---
 		float dx = player->getPosition().x - getPosition().x;
 		float dy = player->getPosition().y - getPosition().y;
 
 		float distance = std::sqrt(dx * dx + dy * dy);
 
-		if (distance <= chargeTriggerRange && distance > 0.f)
+		if (distance > 0.f)
 		{
-			// --- Declenchement de la charge ---
 			chargeDirX = dx / distance;
 			chargeDirY = dy / distance;
-
-			isCharging = true;
-			chargeTimer = chargeDuration;
 		}
-		else
+
+		chargeTimer = chargeDuration;
+	}
+
+	void BelierEnemy::update(float deltaTime)
+	{
+		move(chargeDirX * GetStats().speed * chargeSpeedMultiplier * deltaTime,
+			chargeDirY * GetStats().speed * chargeSpeedMultiplier * deltaTime);
+
+		chargeTimer -= deltaTime;
+
+		if (chargeTimer <= 0.f)
 		{
-			moveTowardPlayer(deltaTime);
+			retarget();
 		}
 	}
 }

@@ -1,8 +1,8 @@
-// GameOverScreen.h
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "InputManager.h"
+#include "Language.h"
 
 enum class GameOverAction
 {

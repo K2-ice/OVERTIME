@@ -1,4 +1,3 @@
-// GameOverScreen.cpp
 #include "pch.h"
 #include "GameOverScreen.h"
 
@@ -16,7 +15,6 @@ GameOverScreen::GameOverScreen(sf::Font& font)
 GameOverAction GameOverScreen::handleInput(EngineL::InputManager& input, const sf::RenderWindow& window)
 {
     bool pressed = input.isMouseButtonPressed(sf::Mouse::Button::Left);
-
     GameOverAction action = GameOverAction::None;
 
     if (pressed && !mouseHeld)
@@ -40,17 +38,18 @@ GameOverAction GameOverScreen::handleInput(EngineL::InputManager& input, const s
 
 void GameOverScreen::render(sf::RenderWindow& window, float survivedTime)
 {
+    bool isFrench = Language::current == LanguageOption::French;
+
     sf::Text title(font);
     title.setCharacterSize(60);
     title.setFillColor(sf::Color::Red);
-    title.setString("Game Over");
+    title.setString(isFrench ? "Partie terminee" : "Game Over");
 
     sf::FloatRect titleBounds = title.getLocalBounds();
     title.setPosition({
         window.getSize().x / 2.f - titleBounds.size.x / 2.f,
         150.f
         });
-
     window.draw(title);
 
     sf::Text timeText(font);
@@ -58,18 +57,17 @@ void GameOverScreen::render(sf::RenderWindow& window, float survivedTime)
     timeText.setFillColor(sf::Color::White);
 
     int seconds = static_cast<int>(survivedTime);
-    timeText.setString("Temps survecu : " + std::to_string(seconds) + " s");
+    timeText.setString((isFrench ? "Temps survecu : " : "Time survived: ") + std::to_string(seconds) + " s");
 
     sf::FloatRect timeBounds = timeText.getLocalBounds();
     timeText.setPosition({
         window.getSize().x / 2.f - timeBounds.size.x / 2.f,
         240.f
         });
-
     window.draw(timeText);
 
-    drawButton(window, kRetryButtonBounds, "Rejouer");
-    drawButton(window, kQuitButtonBounds, "Menu principal");
+    drawButton(window, kRetryButtonBounds, isFrench ? "Rejouer" : "Retry");
+    drawButton(window, kQuitButtonBounds, isFrench ? "Menu principal" : "Main menu");
 }
 
 void GameOverScreen::drawButton(sf::RenderWindow& window, const sf::FloatRect& bounds, const std::string& label)
@@ -80,7 +78,6 @@ void GameOverScreen::drawButton(sf::RenderWindow& window, const sf::FloatRect& b
     box.setFillColor(sf::Color(50, 50, 50));
     box.setOutlineThickness(2.f);
     box.setOutlineColor(sf::Color::White);
-
     window.draw(box);
 
     sf::Text text(font);
@@ -93,6 +90,5 @@ void GameOverScreen::drawButton(sf::RenderWindow& window, const sf::FloatRect& b
         bounds.position.x + bounds.size.x / 2.f - textBounds.size.x / 2.f,
         bounds.position.y + bounds.size.y / 2.f - textBounds.size.y / 2.f - 5.f
         });
-
     window.draw(text);
 }

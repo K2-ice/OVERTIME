@@ -26,13 +26,14 @@ public:
     GameState getState() const;
     void setState(GameState newState);
 
-   
     bool updateMenus(EngineL::InputManager& input, const sf::RenderWindow& window, EngineL::Player& player);
-
     void renderCurrentMenu(sf::RenderWindow& window, EngineL::InputManager& input, EngineL::Player& player, float survivedTime);
-   
+
     SettingsScreen& getSettingsScreen();
     SkillTreeScreen& getSkillTreeScreen();
+    MainMenuScreen& getMainMenuScreen();
+
+    bool consumeContinueRequested();
 
 private:
     GameState state = GameState::MainMenu;
@@ -42,4 +43,6 @@ private:
     PauseScreen pauseScreen;
     SkillTreeScreen skillTreeScreen;
     GameOverScreen gameOverScreen;
+
+    bool continueRequested = false;
 };

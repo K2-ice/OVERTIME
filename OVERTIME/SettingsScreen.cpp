@@ -5,6 +5,7 @@ namespace
 {
     const sf::FloatRect kVolumeMinusBounds({ 490.f, 280.f }, { 50.f, 50.f });
     const sf::FloatRect kVolumePlusBounds({ 640.f, 280.f }, { 50.f, 50.f });
+    const sf::FloatRect kLanguageButtonBounds({ 490.f, 380.f }, { 200.f, 60.f });
     const sf::FloatRect kBackButtonBounds({ 490.f, 500.f }, { 300.f, 70.f });
 }
 
@@ -21,7 +22,6 @@ int SettingsScreen::getVolume() const
 SettingsAction SettingsScreen::handleInput(EngineL::InputManager& input, const sf::RenderWindow& window)
 {
     bool pressed = input.isMouseButtonPressed(sf::Mouse::Button::Left);
-
     SettingsAction action = SettingsAction::None;
 
     if (pressed && !mouseHeld)
@@ -34,16 +34,18 @@ SettingsAction SettingsScreen::handleInput(EngineL::InputManager& input, const s
         if (kVolumeMinusBounds.contains(mouse))
         {
             volume -= 10;
-
             if (volume < 0)
                 volume = 0;
         }
         else if (kVolumePlusBounds.contains(mouse))
         {
             volume += 10;
-
             if (volume > 100)
                 volume = 100;
+        }
+        else if (kLanguageButtonBounds.contains(mouse))
+        {
+            Language::toggle();
         }
         else if (kBackButtonBounds.contains(mouse))
         {
@@ -59,31 +61,31 @@ SettingsAction SettingsScreen::handleInput(EngineL::InputManager& input, const s
 
 void SettingsScreen::render(sf::RenderWindow& window)
 {
+    bool isFrench = Language::current == LanguageOption::French;
+
     sf::Text title(font);
     title.setCharacterSize(50);
     title.setFillColor(sf::Color::White);
-    title.setString("Parametres");
+    title.setString(isFrench ? "Parametres" : "Settings");
 
     sf::FloatRect titleBounds = title.getLocalBounds();
     title.setPosition({
         window.getSize().x / 2.f - titleBounds.size.x / 2.f,
         120.f
         });
-
     window.draw(title);
 
     // Label "Volume"
     sf::Text volumeLabel(font);
     volumeLabel.setCharacterSize(24);
     volumeLabel.setFillColor(sf::Color::White);
-    volumeLabel.setString("Volume : " + std::to_string(volume) + " %");
+    volumeLabel.setString((isFrench ? "Volume : " : "Volume: ") + std::to_string(volume) + " %");
 
     sf::FloatRect volumeLabelBounds = volumeLabel.getLocalBounds();
     volumeLabel.setPosition({
         window.getSize().x / 2.f - volumeLabelBounds.size.x / 2.f,
         220.f
         });
-
     window.draw(volumeLabel);
 
     // Bouton -
@@ -92,8 +94,11 @@ void SettingsScreen::render(sf::RenderWindow& window)
     // Bouton +
     drawButton(window, kVolumePlusBounds, "+");
 
+    // Bouton langue
+    drawButton(window, kLanguageButtonBounds, isFrench ? "Francais" : "English");
+
     // Bouton Retour
-    drawButton(window, kBackButtonBounds, "Retour");
+    drawButton(window, kBackButtonBounds, isFrench ? "Retour" : "Back");
 }
 
 void SettingsScreen::drawButton(sf::RenderWindow& window, const sf::FloatRect& bounds, const std::string& label)
@@ -104,7 +109,6 @@ void SettingsScreen::drawButton(sf::RenderWindow& window, const sf::FloatRect& b
     box.setFillColor(sf::Color(50, 50, 50));
     box.setOutlineThickness(2.f);
     box.setOutlineColor(sf::Color::White);
-
     window.draw(box);
 
     sf::Text text(font);
@@ -117,6 +121,5 @@ void SettingsScreen::drawButton(sf::RenderWindow& window, const sf::FloatRect& b
         bounds.position.x + bounds.size.x / 2.f - textBounds.size.x / 2.f,
         bounds.position.y + bounds.size.y / 2.f - textBounds.size.y / 2.f - 5.f
         });
-
     window.draw(text);
 }

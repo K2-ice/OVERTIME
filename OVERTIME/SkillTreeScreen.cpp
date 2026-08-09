@@ -46,7 +46,6 @@ SkillTreeAction SkillTreeScreen::handleInput(EngineL::InputManager& input, const
 
 		if (pendingNodeIndex != -1)
 		{
-			// --- Popup de confirmation active : on ignore tout sauf ses 2 boutons ---
 			if (kConfirmButtonBounds.contains(mouse))
 			{
 				skillTree.Buy(pendingNodeIndex, player);
@@ -78,12 +77,10 @@ SkillTreeAction SkillTreeScreen::handleInput(EngineL::InputManager& input, const
 
 					if (duringRun)
 					{
-						// On demande confirmation avant de debloquer pendant une run
 						pendingNodeIndex = static_cast<int>(i);
 					}
 					else
 					{
-						// Entre deux runs : achat immediat, comme avant
 						skillTree.Buy(static_cast<int>(i), player);
 					}
 				}
@@ -101,6 +98,8 @@ SkillTreeAction SkillTreeScreen::handleInput(EngineL::InputManager& input, const
 
 void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& player)
 {
+	bool isFrench = Language::current == LanguageOption::French;
+
 	const auto mousePixel = sf::Mouse::getPosition(window);
 	const sf::Vector2f mouse = window.mapPixelToCoords(mousePixel);
 
@@ -112,7 +111,7 @@ void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& pl
 
 	text.setCharacterSize(26);
 	text.setFillColor(sf::Color::White);
-	text.setString("Souls: " + std::to_string(player.getSouls()));
+	text.setString((isFrench ? "Ames: " : "Souls: ") + std::to_string(player.getSouls()));
 
 	sf::FloatRect bounds = text.getLocalBounds();
 	text.setPosition({
@@ -125,7 +124,7 @@ void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& pl
 	{
 		text.setCharacterSize(24);
 		text.setFillColor(sf::Color::White);
-		text.setString("Press ENTER\nTo Start Run");
+		text.setString(isFrench ? "Appuyez sur ENTREE\npour commencer" : "Press ENTER\nTo Start Run");
 
 		bounds = text.getLocalBounds();
 		text.setPosition({
@@ -202,26 +201,31 @@ void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& pl
 		std::string status;
 
 		if (hoveredNode->level >= hoveredNode->maxLevel)
-			status = "Max Level";
+			status = isFrench ? "Niveau max" : "Max Level";
 		else if (hoveredNode->level > 0)
-			status = "Upgraded";
+			status = isFrench ? "Ameliore" : "Upgraded";
 		else if (hoveredNode->unlocked)
-			status = "Available";
+			status = isFrench ? "Disponible" : "Available";
 		else
-			status = "Locked";
+			status = isFrench ? "Verrouille" : "Locked";
+
+		std::string costLabel = isFrench ? " Ames" : " Souls";
+		std::string levelLabel = isFrench ? "Niveau: " : "Level: ";
+		std::string costPrefix = isFrench ? "Cout: " : "Cost: ";
+		std::string statusPrefix = isFrench ? "\nEtat: " : "\nStatus: ";
 
 		text.setString(
 			hoveredNode->name +
 			"\n\n" +
 			hoveredNode->description +
-			"\n\nLevel: " +
+			"\n\n" + levelLabel +
 			std::to_string(hoveredNode->level) +
 			" / " +
 			std::to_string(hoveredNode->maxLevel) +
-			"\n\nCost: " +
+			"\n\n" + costPrefix +
 			std::to_string(hoveredNode->cost) +
-			" Souls" +
-			"\nStatus: " +
+			costLabel +
+			statusPrefix +
 			status);
 
 		text.setPosition(mouse + sf::Vector2f(35.f, 35.f));
@@ -230,7 +234,7 @@ void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& pl
 
 	if (duringRun)
 	{
-		drawButton(window, kBackButtonBounds, "Retour");
+		drawButton(window, kBackButtonBounds, isFrench ? "Retour" : "Back");
 	}
 
 	if (pendingNodeIndex != -1)
@@ -241,6 +245,8 @@ void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& pl
 
 void SkillTreeScreen::drawConfirmPopup(sf::RenderWindow& window)
 {
+	bool isFrench = Language::current == LanguageOption::French;
+
 	sf::RectangleShape overlay;
 	overlay.setSize({ static_cast<float>(window.getSize().x), static_cast<float>(window.getSize().y) });
 	overlay.setFillColor(sf::Color(0, 0, 0, 180));
@@ -260,10 +266,11 @@ void SkillTreeScreen::drawConfirmPopup(sf::RenderWindow& window)
 	sf::Text message(font);
 	message.setCharacterSize(20);
 	message.setFillColor(sf::Color::White);
+
 	message.setString(
-		"Debloquer cette competence maintenant\n"
-		"va relancer la partie en cours.\n\n"
-		"Continuer ?");
+		isFrench
+		? "Debloquer cette competence maintenant\nva relancer la partie en cours.\n\nContinuer ?"
+		: "Unlocking this skill now\nwill restart the current run.\n\nContinue ?");
 
 	sf::FloatRect messageBounds = message.getLocalBounds();
 	message.setPosition({
@@ -272,8 +279,8 @@ void SkillTreeScreen::drawConfirmPopup(sf::RenderWindow& window)
 		});
 	window.draw(message);
 
-	drawButton(window, kConfirmButtonBounds, "Confirmer");
-	drawButton(window, kCancelButtonBounds, "Annuler");
+	drawButton(window, kConfirmButtonBounds, isFrench ? "Confirmer" : "Confirm");
+	drawButton(window, kCancelButtonBounds, isFrench ? "Annuler" : "Cancel");
 }
 
 void SkillTreeScreen::drawButton(sf::RenderWindow& window, const sf::FloatRect& bounds, const std::string& label)

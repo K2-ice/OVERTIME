@@ -11,14 +11,14 @@ namespace EngineL
 		void update(float deltaTime) override;
 
 	private:
-		bool isCharging = false;
+		void retarget();
+
 		float chargeDirX = 0.f;
 		float chargeDirY = 0.f;
 
 		float chargeTimer = 0.f;
 		float chargeDuration = 2.f;
 
-		float chargeTriggerRange = 250.f;
 		float chargeSpeedMultiplier = 2.5f;
 	};
 }

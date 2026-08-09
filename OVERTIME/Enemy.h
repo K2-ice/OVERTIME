@@ -18,7 +18,7 @@ namespace EngineL
 
 	protected:
 		void moveTowardPlayer(float deltaTime, float speedMultiplier = 1.f);
-
+		
 		Player* player;
 
 	private:
