@@ -6,7 +6,7 @@
 WeaponInventory::WeaponInventory()
 	: pistol(WeaponStats{ "Pistolet", 3.f, 10.f, 1, 0.f, 12, 1.2f, -1 })
 	, mitraillette(WeaponStats{ "Mitraillette", 10.f, 6.f, 1, 0.f, 30, 1.8f, 90 })
-	, shotgun(WeaponStats{ "Shotgun", 1.f, 8.f, 5, 30.f, 6, 1.5f, 24 })
+	, shotgun(WeaponStats{ "Fusil a pompe", 1.f, 8.f, 5, 30.f, 6, 1.5f, 24 })
 {
 	reset(false);
 }

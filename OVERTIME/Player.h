@@ -35,12 +35,14 @@ namespace EngineL
 
 		void updateRegen(float deltaTime);
 		void resetRegenTimer();
+		void setWeaponVisual(const std::string& weaponId);
 
 	private:
 
 		InputManager* inputManager;
 		Map* map;
-
+		
+		std::string lastWeaponId;
 		float shootDirectionX = 0.f;
 		float shootDirectionY = 0.f;
 

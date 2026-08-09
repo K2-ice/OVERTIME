@@ -160,4 +160,19 @@ namespace EngineL
 	{
 		maxTime += amount;
 	}
+
+	void Player::setWeaponVisual(const std::string& weaponId)
+	{
+		if (weaponId == lastWeaponId)
+			return;
+
+		lastWeaponId = weaponId;
+
+		if (weaponId == "pistol")
+			setTexture("Assets/Characters/Survivor 1/survivor1_gun.png");
+		else if (weaponId == "mitraillette")
+			setTexture("Assets/Characters/Survivor 1/survivor1_machine.png");
+		else if (weaponId == "shotgun")
+			setTexture("Assets/Characters/Survivor 1/survivor1_silencer.png");
+	}
 }

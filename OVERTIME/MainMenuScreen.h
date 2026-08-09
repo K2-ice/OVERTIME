@@ -8,7 +8,8 @@ enum class MainMenuAction
 	None,
 	Play,
 	Continue,
-	Settings
+	Settings,
+	Quit
 };
 
 class MainMenuScreen

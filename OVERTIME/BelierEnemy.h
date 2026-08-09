@@ -6,7 +6,7 @@ namespace EngineL
 	class BelierEnemy : public Enemy
 	{
 	public:
-		BelierEnemy(float x, float y, Player* player, float difficulty);
+		BelierEnemy(float x, float y, Player* player, float difficulty, Map* map);
 
 		void update(float deltaTime) override;
 
