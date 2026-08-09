@@ -177,7 +177,6 @@
     <ClCompile Include="UpdateManager.cpp" />
     <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="WeaponPickup.cpp" />
-    <ClCompile Include="WeaponStats.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -8,7 +8,7 @@ namespace EngineL
 	class Enemy : public Entity
 	{
 	public:
-		Enemy(float x, float y, Player* player);
+		Enemy(float x, float y, Player* player, float difficulty);
 
 		void update(float deltaTime) override;
 

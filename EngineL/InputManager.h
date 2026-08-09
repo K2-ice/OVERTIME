@@ -21,7 +21,10 @@ namespace EngineL
 		bool isPausePressed() const;
 		bool isStartPressed() const;
 		bool isReloadPressed() const;
+		void handleEvent(const sf::Event& event);
 
+		float getMouseWheelDelta() const;
+		void beginFrame();
 	private:
 		static const int KeyCount = 101;
 		static const int MouseButtonCount = 5;
@@ -30,5 +33,6 @@ namespace EngineL
 		bool previousKeys[KeyCount];
 
 		bool currentMouseButtons[MouseButtonCount];
+		float mouseWheelDelta = 0.f;
 	};
 }

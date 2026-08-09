@@ -11,5 +11,5 @@ struct WeaponStats {
 	float spreadAngleDegrees = 0.f;
 	int magazineSize = 10;
 	float reloadTime = 1.f;
-	int reserveAmmo = -1; // -1 = réserve infinie
+	int reserveAmmo = -1;
 };

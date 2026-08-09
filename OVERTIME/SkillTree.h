@@ -4,7 +4,7 @@
 
 #include "SkillNode.h"
 #include "Player.h"
-
+#include "WeaponInventory.h"
 using EngineL::Player;
 
 class SkillTree
@@ -16,7 +16,8 @@ public:
 	void BuildTree();
 
 	void Buy(int index,
-		Player& player);
+		Player& player,
+		WeaponInventory& weaponInventory);
 
 	std::vector<SkillNode>& GetNodes();
 

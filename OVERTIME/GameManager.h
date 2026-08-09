@@ -15,7 +15,7 @@
 #include "RenderManager.h"
 #include "SkillTreeScreen.h"
 #include "HUD.h"
-
+#include <iostream>
 #include <SFML/Graphics/Font.hpp>
 
 class GameManager
@@ -61,11 +61,11 @@ private:
 
 	float spawnTimer = 0.f;
 	float spawnDelay = 1.f;
-
-	bool showSkillTree = false;
+	float death = 0.f;
+	bool showSkillTree = true;
 
 	float runTime = 0.f;
-	float maxRunTime = 10.f;
+	float maxRunTime = player.getMaxTime();
 
 	sf::Font font;
 	HUD hud;

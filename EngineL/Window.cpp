@@ -14,12 +14,14 @@ namespace EngineL {
 		return window.isOpen();
 	}
 
-	void Window::pollEvents()
+	void Window::pollEvents(InputManager& input)
 	{
 		while (const std::optional event = window.pollEvent())
 		{
 			if (event->is<sf::Event::Closed>())
 				window.close();
+
+			input.handleEvent(*event);
 		}
 	}
 

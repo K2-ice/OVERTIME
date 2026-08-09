@@ -10,13 +10,18 @@ enum class SkillType
 	Health,
 	Speed,
 	AttackSpeed,
-	Range,
+	Time,
+	CritChance,
+	CritDamage,
+	LifeSteal,
+	ReloadSpeed,
+	Regen,
+	Difficulty,
+	Capacity,
 
 	WeaponSlot,
-
-	UnlockBow,
-	UnlockStaff,
-	UnlockGun
+	UnlockShotgun,
+	UnlockSubmachinegun,
 };
 
 struct SkillNode

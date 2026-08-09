@@ -5,16 +5,22 @@
 
 namespace EngineL
 {
-	Enemy::Enemy(float x, float y, Player* player)
+	Enemy::Enemy(float x, float y, Player* player, float difficulty)
 		: Entity(x, y, 32.f, 32.f, sf::Color::Red)
 	{
 		this->player = player;
 
 		Stats s;
-		s.health = 30;
-		s.maxHealth = 30;
+		s.health = 30.f * 2 * difficulty;
+		s.damage = 5.f * 2 * difficulty;
+		s.maxHealth = 30 * 2 * difficulty;
 		s.speed = 120.f;
-		s.damage = 5.f;
+		if (difficulty == 2)
+			stats.speed *= 1.25f;
+		else if (difficulty == 3)
+			stats.speed *= 1.5f;
+		else if (difficulty == 4)
+			stats.speed *= 2.f;
 
 		setStats(s);
 	}

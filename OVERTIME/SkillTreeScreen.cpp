@@ -4,46 +4,99 @@
 SkillTreeScreen::SkillTreeScreen(sf::Font& font)
 	: font(font)
 {
+	treeView.setSize({ 1280.f, 720.f });
+	treeView.setCenter({ 300.f, 100.f });
 }
 
-void SkillTreeScreen::handleInput(EngineL::InputManager& input, const sf::RenderWindow& window, EngineL::Player& player)
+void SkillTreeScreen::handleInput(
+	EngineL::InputManager& input,
+	const sf::RenderWindow& window,
+	EngineL::Player& player,
+	WeaponInventory& weaponInventory)
 {
+	float wheel = input.getMouseWheelDelta();
+
+	if (wheel > 0.f)
+		zoom *= 0.9f;
+	else if (wheel < 0.f)
+		zoom *= 1.1f;
+
+	zoom = std::clamp(zoom, minZoom, maxZoom);
+	treeView.setSize({ 1280.f * zoom, 720.f * zoom });
+
 	bool pressed = input.isMouseButtonPressed(sf::Mouse::Button::Left);
 
-	if (pressed && !mouseHeld)
+	if (pressed && !leftPressed)
 	{
-		mouseHeld = true;
+		leftPressed = true;
+		dragging = false;
 
-		sf::Vector2i mousePixel = input.getMousePosition(window);
+		dragStart = input.getMousePosition(window);
+		lastMousePos = dragStart;
+	}
 
-		sf::Vector2f mouse(
-			static_cast<float>(mousePixel.x),
-			static_cast<float>(mousePixel.y));
+	if (pressed)
+	{
+		sf::Vector2i current = input.getMousePosition(window);
 
-		auto& nodes = skillTree.GetNodes();
+		float dx = static_cast<float>(current.x - dragStart.x);
+		float dy = static_cast<float>(current.y - dragStart.y);
 
-		for (size_t i = 0; i < nodes.size(); i++)
+		if (!dragging && dx * dx + dy * dy > 25.f)
 		{
-			float dx = mouse.x - nodes[i].position.x;
-			float dy = mouse.y - nodes[i].position.y;
+			dragging = true;
+		}
 
-			if (dx * dx + dy * dy <= 20.f * 20.f)
-			{
-				skillTree.Buy(static_cast<int>(i), player);
-			}
+		if (dragging)
+		{
+			sf::Vector2f before =
+				window.mapPixelToCoords(lastMousePos, treeView);
+
+			sf::Vector2f after =
+				window.mapPixelToCoords(current, treeView);
+
+			treeView.move(before - after);
+
+			lastMousePos = current;
 		}
 	}
 
-	if (!pressed)
+	if (!pressed && leftPressed)
 	{
-		mouseHeld = false;
+		leftPressed = false;
+
+		if (!dragging)
+		{
+			const auto mousePixel = input.getMousePosition(window);
+
+			const sf::Vector2f mouse =
+				window.mapPixelToCoords(mousePixel, treeView);
+
+			auto& nodes = skillTree.GetNodes();
+
+			for (size_t i = 0; i < nodes.size(); i++)
+			{
+				float dx = mouse.x - nodes[i].position.x;
+				float dy = mouse.y - nodes[i].position.y;
+
+				if (dx * dx + dy * dy <= 20.f * 20.f)
+				{
+					skillTree.Buy(static_cast<int>(i), player, weaponInventory);
+					break;
+				}
+			}
+		}
+
+		dragging = false;
 	}
 }
 
 void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& player)
 {
+	window.setView(window.getDefaultView());
 	const auto mousePixel = sf::Mouse::getPosition(window);
-	const sf::Vector2f mouse = window.mapPixelToCoords(mousePixel);
+	const sf::Vector2f mouse =
+		window.mapPixelToCoords(mousePixel, treeView);
 
 	const SkillNode* hoveredNode = nullptr;
 
@@ -79,6 +132,8 @@ void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& pl
 
 	window.draw(text);
 
+	window.setView(treeView);
+
 	for (const auto& node : nodes)
 	{
 		for (int childIndex : node.children)
@@ -97,41 +152,93 @@ void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& pl
 
 	for (const auto& node : nodes)
 	{
-		sf::CircleShape circle(20.f);
+		bool isDifficulty = node.type == SkillType::Difficulty;
+		bool isWeaponSlot = node.type == SkillType::WeaponSlot;
+		bool isShotgun = node.type == SkillType::UnlockShotgun;
+		bool isSubmachinegun = node.type == SkillType::UnlockSubmachinegun;
 
-		circle.setOrigin({ 20.f, 20.f });
-		circle.setPosition(node.position);
+		sf::Color fillColor;
 
 		if (node.level >= node.maxLevel)
 		{
-			circle.setFillColor(sf::Color(255, 215, 0));
+			fillColor = sf::Color(255, 215, 0);
 		}
 		else if (!node.unlocked)
 		{
-			circle.setFillColor(sf::Color(80, 80, 80));
+			fillColor = sf::Color(80, 80, 80);
 		}
 		else if (player.getSouls() < node.cost)
 		{
-			circle.setFillColor(sf::Color(200, 50, 50));
+			fillColor = sf::Color(200, 50, 50);
 		}
 		else
 		{
-			circle.setFillColor(sf::Color::Green);
+			fillColor = sf::Color::Green;
 		}
 
 		float dx = mouse.x - node.position.x;
 		float dy = mouse.y - node.position.y;
 
-		if (dx * dx + dy * dy <= 20.f * 20.f)
+		bool hovered = dx * dx + dy * dy <= 20.f * 20.f;
+
+		if (isDifficulty)
 		{
-			hoveredNode = &node;
+			sf::RectangleShape diamond({ 28.f, 28.f });
 
-			circle.setScale({ 1.15f, 1.15f });
-			circle.setOutlineThickness(3.f);
-			circle.setOutlineColor(sf::Color::White);
+			diamond.setOrigin({ 14.f, 14.f });
+			diamond.setPosition(node.position);
+			diamond.setRotation(sf::degrees(45.f));
+			diamond.setFillColor(fillColor);
+
+			if (hovered)
+			{
+				hoveredNode = &node;
+
+				diamond.setScale({ 1.15f, 1.15f });
+				diamond.setOutlineThickness(3.f);
+				diamond.setOutlineColor(sf::Color::White);
+			}
+
+			window.draw(diamond);
 		}
+		else if (isWeaponSlot || isShotgun || isSubmachinegun)
+		{
+			sf::RectangleShape square({ 32.f, 32.f });
 
-		window.draw(circle);
+			square.setOrigin({ 16.f, 16.f });
+			square.setPosition(node.position);
+			square.setFillColor(fillColor);
+
+			if (hovered)
+			{
+				hoveredNode = &node;
+
+				square.setScale({ 1.15f, 1.15f });
+				square.setOutlineThickness(3.f);
+				square.setOutlineColor(sf::Color::White);
+			}
+
+			window.draw(square);
+		}
+		else
+		{
+			sf::CircleShape circle(20.f);
+
+			circle.setOrigin({ 20.f, 20.f });
+			circle.setPosition(node.position);
+			circle.setFillColor(fillColor);
+
+			if (hovered)
+			{
+				hoveredNode = &node;
+
+				circle.setScale({ 1.15f, 1.15f });
+				circle.setOutlineThickness(3.f);
+				circle.setOutlineColor(sf::Color::White);
+			}
+
+			window.draw(circle);
+		}
 	}
 
 	if (hoveredNode)
@@ -139,7 +246,7 @@ void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& pl
 		sf::RectangleShape box;
 
 		box.setPosition(mouse + sf::Vector2f(25.f, 25.f));
-		box.setSize({ 320.f, 180.f });
+		box.setSize({ 330.f, 200.f });
 
 		box.setFillColor(sf::Color(25, 25, 25, 240));
 		box.setOutlineThickness(2.f);
@@ -169,22 +276,36 @@ void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& pl
 			status = "Locked";
 		}
 
-		text.setString(
+		std::string info =
 			hoveredNode->name +
 			"\n\n" +
 			hoveredNode->description +
 			"\n\nLevel: " +
 			std::to_string(hoveredNode->level) +
 			" / " +
-			std::to_string(hoveredNode->maxLevel) +
-			"\n\nCost: " +
-			std::to_string(hoveredNode->cost) +
-			" Souls" +
+			std::to_string(hoveredNode->maxLevel);
+
+		if (hoveredNode->level < hoveredNode->maxLevel)
+		{
+			info +=
+				"\n\nCost: " +
+				std::to_string(hoveredNode->cost) +
+				" Souls";
+		}
+		else
+		{
+			info += "\n\n";
+		}
+
+		info +=
 			"\nStatus: " +
-			status);
+			status;
+
+		text.setString(info);
 
 		text.setPosition(mouse + sf::Vector2f(35.f, 35.f));
 
 		window.draw(text);
 	}
+	window.setView(window.getDefaultView());
 }

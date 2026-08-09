@@ -20,6 +20,23 @@ namespace EngineL {
 			currentMouseButtons[i] = sf::Mouse::isButtonPressed(static_cast<sf::Mouse::Button>(i));
 		}
 	}
+	void InputManager::handleEvent(const sf::Event& event)
+	{
+		if (const auto* wheel = event.getIf<sf::Event::MouseWheelScrolled>())
+		{
+			mouseWheelDelta += wheel->delta;
+		}
+	}
+
+	float InputManager::getMouseWheelDelta() const
+	{
+		return mouseWheelDelta;
+	}
+
+	void InputManager::beginFrame()
+	{
+		mouseWheelDelta = 0.f;
+	}
 
 	bool InputManager::isKeyPressed(sf::Keyboard::Key key) const
 	{

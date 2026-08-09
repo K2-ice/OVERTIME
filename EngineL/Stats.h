@@ -10,4 +10,12 @@ struct Stats
 	float maxHealth = 100.f;
 
 	float attackSpeed = 1.f;
+	float critChance = 0.f;
+	float critDamage = 1.f;
+	float lifesteal = 0.f;
+	float reloadSpeed = 1.f;
+	float regen = 0.f;
+	int difficulty = 1;
+	bool hasShotgun = false;
+	bool hasSubmachinegun = false;
 };

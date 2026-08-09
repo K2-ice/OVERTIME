@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <string>
+#include "InputManager.h"
 
 namespace EngineL {
 
@@ -11,7 +12,7 @@ namespace EngineL {
 		Window(unsigned int width, unsigned int height, const std::string& title);
 
 		bool isOpen() const;
-		void pollEvents();
+		void pollEvents(InputManager& input);
 		void clear();
 		void display();
 		void close();

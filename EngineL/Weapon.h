@@ -15,9 +15,10 @@ namespace EngineL
 		void update(float deltaTime);
 		bool canFire() const;
 
-		std::vector<Bullet*> fire(float x, float y, float dirX, float dirY);
+		std::vector<Bullet*> fire(float x, float y, float dirX, float dirY, float damageBonus, float fireRateBonus);
 
-		void startReload();
+		void startReload(float reloadspeed);
+		void resetAmmo();
 		bool isReloading() const;
 
 		std::string getName() const;
@@ -25,6 +26,7 @@ namespace EngineL
 		int getMagazineSize() const;
 		int getReserveAmmo() const;
 		bool hasInfiniteReserve() const;
+		void increaseCapacity(float magazineIncrease, float reserveIncrease);
 
 	private:
 		std::string name;
@@ -40,6 +42,7 @@ namespace EngineL
 		bool reloading = false;
 
 		int reserveAmmo;
+		int maxReserveAmmo;
 		bool infiniteReserve;
 
 		float cooldown = 0.f;

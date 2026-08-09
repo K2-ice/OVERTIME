@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "GameManager.h"
-
 #include <cmath>
 #include <cstdlib>
 
@@ -18,7 +17,7 @@ GameManager::GameManager()
 	if (!font.openFromFile("Assets/arial.ttf"))
 		throw std::runtime_error("Failed to load font.");
 
-	player.addSouls(50);
+	player.addSouls(50000);
 }
 
 GameManager::~GameManager()
@@ -72,7 +71,7 @@ void GameManager::update(float deltaTime)
 		skillTreeScreen.handleInput(
 			engine.getInputManager(),
 			engine.getWindow().getRenderWindow(),
-			player);
+			player, weaponInventory);
 
 		if (engine.getInputManager().isStartPressed())
 		{
@@ -94,6 +93,7 @@ void GameManager::update(float deltaTime)
 
 	if (runTime >= maxRunTime)
 	{
+		std::cout << death << std::endl;
 		showSkillTree = true;
 		return;
 	}
@@ -138,7 +138,7 @@ void GameManager::handleReload()
 {
 	if (engine.getInputManager().isReloadPressed())
 	{
-		weaponInventory.getCurrentWeapon()->startReload();
+		weaponInventory.getCurrentWeapon()->startReload(player.GetStats().reloadSpeed);
 	}
 }
 
@@ -152,7 +152,7 @@ void GameManager::handleShooting()
 		float dirY = player.getShootDirectionY();
 
 		std::vector<EngineL::Bullet*> newBullets =
-			weaponInventory.getCurrentWeapon()->fire(x, y, dirX, dirY);
+			weaponInventory.getCurrentWeapon()->fire(x, y, dirX, dirY, player.GetStats().damage, player.GetStats().attackSpeed);
 
 		for (EngineL::Bullet* bullet : newBullets)
 		{
@@ -165,6 +165,7 @@ void GameManager::handleShooting()
 
 void GameManager::spawnEnemy()
 {
+	std::cout << player.GetStats().difficulty << std::endl;
 	sf::Vector2f playerPos = player.getPosition();
 
 	float angle =
@@ -175,7 +176,7 @@ void GameManager::spawnEnemy()
 	float x = playerPos.x + std::cos(angle) * 500.f;
 	float y = playerPos.y + std::sin(angle) * 500.f;
 
-	EngineL::Enemy* enemy = new EngineL::Enemy(x, y, &player);
+	EngineL::Enemy* enemy = new EngineL::Enemy(x, y, &player, player.GetStats().difficulty);
 
 	enemies.push_back(enemy);
 
@@ -220,8 +221,44 @@ void GameManager::checkBulletEnemyCollisions()
 
 			if (bullet->getBounds().findIntersection(enemy->getBounds()))
 			{
-				enemy->takeDamage(
-					static_cast<int>(bullet->getDamage()));
+				float damage = bullet->getDamage();
+
+				float rollcrit = static_cast<float>(rand()) / RAND_MAX;
+
+				bool isCrit = rollcrit < player.GetStats().critChance;
+
+				if (isCrit)
+				{
+					damage *= (player.GetStats().critDamage);
+
+					if (player.GetStats().health < player.GetStats().maxHealth)
+					{
+						float lifestealAmount = damage * player.GetStats().lifesteal;
+						if (lifestealAmount > player.GetStats().maxHealth - player.GetStats().health)
+						{
+							lifestealAmount = player.GetStats().maxHealth - player.GetStats().health;
+						}
+						player.takeDamage(-static_cast<int>(lifestealAmount));
+					}
+					std::cout << "CRIT! Damage: "
+						<< damage << std::endl;
+				}
+				else
+				{
+					if (player.GetStats().health < player.GetStats().maxHealth)
+					{
+						float lifestealAmount = damage * player.GetStats().lifesteal;
+						if (lifestealAmount > player.GetStats().maxHealth - player.GetStats().health)
+						{
+							lifestealAmount = player.GetStats().maxHealth - player.GetStats().health;
+						}
+						player.takeDamage(-static_cast<int>(lifestealAmount));
+					}
+					std::cout << "Damage: "
+						<< damage << std::endl;
+				}
+
+				enemy->takeDamage(static_cast<int>(damage));
 
 				updateManager.remove(bullet);
 				renderManager.remove(bullet);
@@ -251,6 +288,7 @@ void GameManager::cleanupEnemies()
 
 		if (!enemy->isAlive())
 		{
+			death += 1;
 			EngineL::Soul* soul =
 				new EngineL::Soul(
 					enemy->getPosition().x,
@@ -264,7 +302,7 @@ void GameManager::cleanupEnemies()
 			EngineL::WeaponPickup* pickup =
 				weaponInventory.tryDropWeapon(
 					enemy->getPosition().x,
-					enemy->getPosition().y);
+					enemy->getPosition().y, player.GetStats().hasShotgun, player.GetStats().hasSubmachinegun);
 
 			if (pickup != nullptr)
 			{
@@ -293,7 +331,7 @@ void GameManager::collectSouls()
 
 		if (player.getBounds().findIntersection(soul->getBounds()))
 		{
-			player.addSouls(soul->getValue());
+			player.addSouls(soul->getValue() * player.GetStats().difficulty);
 
 			updateManager.remove(soul);
 			renderManager.remove(soul);
@@ -353,15 +391,20 @@ void GameManager::checkEnemyPlayerCollisions()
 
 void GameManager::startNewRun()
 {
+
 	showSkillTree = false;
+	maxRunTime = player.getMaxTime();
 	runTime = 0.f;
 	spawnTimer = 0.f;
 
 	player.setPosition(400.f, 300.f);
+	player.resetDamageCooldown();
+	player.resetRegenTimer();
 
 	Stats& stats = player.GetStats();
 	stats.health = stats.maxHealth;
 
+	weaponInventory.reloadAll();
 	weaponInventory.reset(player.hasSecondWeaponSlot());
 
 	for (auto bullet : bullets)

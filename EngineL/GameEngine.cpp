@@ -19,7 +19,9 @@ namespace EngineL
     {
         float deltaTime = clock.restart().asSeconds();
 
-        window.pollEvents();
+        inputManager.beginFrame();
+
+        window.pollEvents(inputManager);
         inputManager.update(window.getRenderWindow());
         window.clear();
 

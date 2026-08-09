@@ -24,7 +24,6 @@ namespace EngineL
 		Stats& GetStats();
 		const Stats& GetStats() const;
 		sf::FloatRect getBounds() const;
-
 	protected:
 		sf::RectangleShape shape;
 		Stats stats;

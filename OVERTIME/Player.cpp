@@ -13,9 +13,14 @@ namespace EngineL
 		s.health = 100;
 		s.maxHealth = 100;
 		s.speed = 300.f;
-		s.damage = 10.f;
+		s.damage = 0.f;
 		s.attackSpeed = 1.f;
-
+		s.critChance = 0.05f;
+		s.critDamage = 1.f;
+		s.lifesteal = 0.f;
+		s.reloadSpeed = 1.f;
+		s.regen = 0.f;
+		s.difficulty = 1;
 		setStats(s);
 	}
 
@@ -54,8 +59,30 @@ namespace EngineL
 			if (damageCooldown < 0.f)
 				damageCooldown = 0.f;
 		}
+		updateRegen(deltaTime);
 	}
 
+	void Player::updateRegen(float deltaTime)
+	{
+		if (stats.regen <= 0.f)
+			return;
+
+		regenTimer += deltaTime;
+
+		if (regenTimer >= 5.f)
+		{
+			stats.health += static_cast<int>(stats.regen);
+
+			if (stats.health > stats.maxHealth)
+				stats.health = stats.maxHealth;
+
+			regenTimer -= 5.f;
+		}
+	}
+	void Player::resetRegenTimer()
+	{
+		regenTimer = 0;
+	}
 	void Player::aimAt(float mouseX, float mouseY)
 	{
 		float playerX = getPosition().x;
@@ -125,5 +152,14 @@ namespace EngineL
 	void Player::unlockSecondWeaponSlot()
 	{
 		secondWeaponSlotUnlocked = true;
+	}
+	float Player::getMaxTime() const
+	{
+		return maxTime;
+	}
+
+	void Player::increaseMaxTime(float amount)
+	{
+		maxTime += amount;
 	}
 }

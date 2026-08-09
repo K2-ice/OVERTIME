@@ -28,6 +28,12 @@ namespace EngineL
 		bool hasSecondWeaponSlot() const;
 		void unlockSecondWeaponSlot();
 
+		float getMaxTime() const;
+		void increaseMaxTime(float amount);
+
+		void updateRegen(float deltaTime);
+		void resetRegenTimer();
+
 	private:
 		InputManager* inputManager;
 
@@ -40,5 +46,8 @@ namespace EngineL
 		float damageCooldownMax = 0.5f;
 
 		bool secondWeaponSlotUnlocked = false;
+		float maxTime = 10.f;
+
+		float regenTimer = 0.f;
 	};
 }
