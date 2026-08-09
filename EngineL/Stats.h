@@ -1,7 +1,7 @@
 #pragma once
 
-struct Stats
-{
+struct Stats {
+
 	float speed = 500.f;
 
 	float damage = 10.f;
@@ -15,7 +15,9 @@ struct Stats
 	float lifesteal = 0.f;
 	float reloadSpeed = 1.f;
 	float regen = 0.f;
+
 	int difficulty = 1;
+
 	bool hasShotgun = false;
 	bool hasSubmachinegun = false;
 };

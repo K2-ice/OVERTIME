@@ -3,8 +3,8 @@
 #include "Bullet.h"
 #include <vector>
 
-namespace EngineL
-{
+namespace EngineL {
+
 	class Boss : public Enemy
 	{
 	public:

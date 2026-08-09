@@ -8,8 +8,8 @@
 #include "SkillTreeScreen.h"
 #include "GameOverScreen.h"
 
-enum class GameState
-{
+enum class GameState {
+
 	MainMenu,
 	Playing,
 	Paused,
@@ -18,9 +18,10 @@ enum class GameState
 	GameOver
 };
 
-class SceneManager
-{
+class SceneManager {
+
 public:
+
 	SceneManager(sf::Font& font);
 
 	GameState getState() const;
@@ -36,6 +37,7 @@ public:
 	bool consumeContinueRequested();
 
 private:
+
 	GameState state = GameState::MainMenu;
 
 	MainMenuScreen mainMenuScreen;

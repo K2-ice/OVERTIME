@@ -2,10 +2,10 @@
 #include "Entity.h"
 #include "Player.h"
 
-namespace EngineL
-{
-	class Enemy : public Entity
-	{
+namespace EngineL {
+
+	class Enemy : public Entity {
+
 	public:
 		Enemy(float x, float y, Player* player, float difficulty, Map* map);
 
@@ -17,11 +17,13 @@ namespace EngineL
 		virtual bool explodesOnContact() const;
 
 	protected:
+
 		void moveTowardPlayer(float deltaTime, float speedMultiplier = 1.f);
 		bool tryMove(float moveX, float moveY);
 		Player* player;
 
 	private:
+
 		float healthBarTimer = 0.f;
 		float healthBarDuration = 2.f;
 		Map* map;

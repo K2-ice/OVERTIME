@@ -4,8 +4,8 @@
 #include "Map.h"
 namespace EngineL
 {
-	class Player : public Entity
-	{
+	class Player : public Entity {
+
 	public:
 
 		Player(float x, float y, InputManager* inputManager, Map* map);
@@ -41,7 +41,7 @@ namespace EngineL
 
 		InputManager* inputManager;
 		Map* map;
-		
+
 		std::string lastWeaponId;
 		float shootDirectionX = 0.f;
 		float shootDirectionY = 0.f;

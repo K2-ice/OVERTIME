@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-enum class SkillType
-{
+enum class SkillType {
+
 	Damage,
 	Health,
 	Speed,
@@ -24,8 +24,8 @@ enum class SkillType
 	UnlockSubmachinegun,
 };
 
-struct SkillNode
-{
+struct SkillNode {
+
 	SkillType type;
 
 	std::string name;

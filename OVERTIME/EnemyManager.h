@@ -13,10 +13,10 @@
 #include "CollisionManager.h"
 #include "Map.h"
 
-namespace EngineL
-{
-	class EnemyManager
-	{
+namespace EngineL {
+
+	class EnemyManager {
+
 	public:
 
 		EnemyManager(UpdateManager& updateManager, RenderManager& renderManager, Player* player, Map* map);
@@ -31,6 +31,7 @@ namespace EngineL
 		void clear();
 
 	private:
+
 		void spawnEnemy();
 		void spawnBoss();
 		void updateBossAttacks();

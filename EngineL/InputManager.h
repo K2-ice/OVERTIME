@@ -1,16 +1,14 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-namespace EngineL
-{
-	enum class KeyLayout
-	{
+namespace EngineL {
+
+	enum class KeyLayout {
 		AZERTY,
 		QWERTY
 	};
 
-	class InputManager
-	{
+	class InputManager {
 	public:
 		void update(const sf::RenderWindow& window);
 
@@ -34,7 +32,9 @@ namespace EngineL
 
 		float getMouseWheelDelta() const;
 		void beginFrame();
+
 	private:
+
 		static const int KeyCount = 101;
 		static const int MouseButtonCount = 5;
 

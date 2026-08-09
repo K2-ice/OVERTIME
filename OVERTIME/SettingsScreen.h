@@ -8,6 +8,7 @@ enum class SettingsAction {
 	None,
 	Back
 };
+
 class SettingsScreen {
 
 public:
