@@ -31,11 +31,6 @@ public:
 
 	void render(sf::RenderWindow& window, const EngineL::Player& player);
 
-	void render(
-		sf::RenderWindow& window,
-		const EngineL::Player& player
-	);
-
 private:
 	bool canAfford(
 		const SkillNode& node,

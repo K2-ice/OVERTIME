@@ -49,7 +49,6 @@ void HUD::draw(sf::RenderWindow& window, EngineL::Player& player, EngineL::Weapo
 
 	sf::Text text(font);
 
-	// Chrono
 	text.setCharacterSize(30);
 	text.setFillColor(sf::Color::White);
 

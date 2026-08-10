@@ -3,8 +3,9 @@
 
 namespace
 {
-	const sf::FloatRect kRetryButtonBounds({ 490.f, 350.f }, { 300.f, 70.f });
-	const sf::FloatRect kQuitButtonBounds({ 490.f, 450.f }, { 300.f, 70.f });
+	const sf::FloatRect kRetryButtonBounds({ 490.f, 300.f }, { 300.f, 70.f });
+	const sf::FloatRect kSkillTreeButtonBounds({ 490.f, 400.f }, { 300.f, 70.f });
+	const sf::FloatRect kQuitButtonBounds({ 490.f, 500.f }, { 300.f, 70.f });
 }
 
 GameOverScreen::GameOverScreen(sf::Font& font)
@@ -12,22 +13,38 @@ GameOverScreen::GameOverScreen(sf::Font& font)
 {
 }
 
-GameOverAction GameOverScreen::handleInput(EngineL::InputManager& input, const sf::RenderWindow& window)
+GameOverAction GameOverScreen::handleInput(
+	EngineL::InputManager& input,
+	const sf::RenderWindow& window)
 {
-	bool pressed = input.isMouseButtonPressed(sf::Mouse::Button::Left);
+	bool pressed =
+		input.isMouseButtonPressed(sf::Mouse::Button::Left);
+
 	GameOverAction action = GameOverAction::None;
 
 	if (pressed && !mouseHeld)
 	{
 		mouseHeld = true;
 
-		sf::Vector2i mousePixel = input.getMousePosition(window);
-		sf::Vector2f mouse(static_cast<float>(mousePixel.x), static_cast<float>(mousePixel.y));
+		sf::Vector2i mousePixel =
+			input.getMousePosition(window);
+
+		sf::Vector2f mouse(
+			static_cast<float>(mousePixel.x),
+			static_cast<float>(mousePixel.y));
 
 		if (kRetryButtonBounds.contains(mouse))
+		{
 			action = GameOverAction::Retry;
+		}
+		else if (kSkillTreeButtonBounds.contains(mouse))
+		{
+			action = GameOverAction::SkillTree;
+		}
 		else if (kQuitButtonBounds.contains(mouse))
+		{
 			action = GameOverAction::QuitToMenu;
+		}
 	}
 
 	if (!pressed)
@@ -36,38 +53,69 @@ GameOverAction GameOverScreen::handleInput(EngineL::InputManager& input, const s
 	return action;
 }
 
-void GameOverScreen::render(sf::RenderWindow& window, float survivedTime)
+void GameOverScreen::render(
+	sf::RenderWindow& window,
+	float survivedTime)
 {
-	bool isFrench = Language::current == LanguageOption::French;
+	bool isFrench =
+		Language::current == LanguageOption::French;
 
 	sf::Text title(font);
 	title.setCharacterSize(60);
 	title.setFillColor(sf::Color::Red);
-	title.setString(isFrench ? "Partie terminee" : "Game Over");
+	title.setString(
+		isFrench ? "Partie terminee" : "Game Over");
 
-	sf::FloatRect titleBounds = title.getLocalBounds();
+	sf::FloatRect titleBounds =
+		title.getLocalBounds();
+
 	title.setPosition({
-		window.getSize().x / 2.f - titleBounds.size.x / 2.f,
-		150.f
+		window.getSize().x / 2.f
+			- titleBounds.size.x / 2.f,
+		100.f
 		});
+
 	window.draw(title);
 
 	sf::Text timeText(font);
 	timeText.setCharacterSize(24);
 	timeText.setFillColor(sf::Color::White);
 
-	int seconds = static_cast<int>(survivedTime);
-	timeText.setString((isFrench ? "Temps survecu : " : "Time survived: ") + std::to_string(seconds) + " s");
+	int seconds =
+		static_cast<int>(survivedTime);
 
-	sf::FloatRect timeBounds = timeText.getLocalBounds();
+	timeText.setString(
+		(isFrench
+			? "Temps survecu : "
+			: "Time survived: ")
+		+ std::to_string(seconds)
+		+ " s");
+
+	sf::FloatRect timeBounds =
+		timeText.getLocalBounds();
+
 	timeText.setPosition({
-		window.getSize().x / 2.f - timeBounds.size.x / 2.f,
-		240.f
+		window.getSize().x / 2.f
+			- timeBounds.size.x / 2.f,
+		190.f
 		});
+
 	window.draw(timeText);
 
-	drawButton(window, kRetryButtonBounds, isFrench ? "Rejouer" : "Retry");
-	drawButton(window, kQuitButtonBounds, isFrench ? "Menu principal" : "Main menu");
+	drawButton(
+		window,
+		kRetryButtonBounds,
+		isFrench ? "Rejouer" : "Retry");
+
+	drawButton(
+		window,
+		kSkillTreeButtonBounds,
+		isFrench ? "Arbre de competences" : "Skill Tree");
+
+	drawButton(
+		window,
+		kQuitButtonBounds,
+		isFrench ? "Menu principal" : "Main menu");
 }
 
 void GameOverScreen::drawButton(sf::RenderWindow& window, const sf::FloatRect& bounds, const std::string& label)
