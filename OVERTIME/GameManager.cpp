@@ -37,6 +37,7 @@ GameManager::GameManager()
 			}
 			else
 			{
+
 				int variant = (x + y) % 4;
 				layout[y][x] = 1 + variant;
 			}
@@ -166,6 +167,8 @@ void GameManager::update(float deltaTime)
 
 	if (runTime >= maxRunTime)
 	{
+		updateRecords();
+
 		sceneManager.getSkillTreeScreen().setDuringRun(false);
 		sceneManager.setState(GameState::SkillTree);
 		showSkillTree = true;
@@ -193,6 +196,7 @@ void GameManager::update(float deltaTime)
 
 	if (player.GetStats().health <= 0)
 	{
+		updateRecords();
 		sceneManager.setState(GameState::GameOver);
 	}
 }
@@ -253,8 +257,6 @@ void GameManager::handleShooting()
 	}
 }
 
-
-
 void GameManager::cleanupBullets()
 {
 	float mapPixelWidth = static_cast<float>(EngineL::Map::width * EngineL::Map::tileSize);
@@ -285,6 +287,8 @@ void GameManager::cleanupEnemies()
 {
 	std::vector<sf::Vector2f> deathPositions = enemyManager.removeDeadEnemies();
 
+	killsThisRun += static_cast<int>(deathPositions.size());
+
 	for (const sf::Vector2f& position : deathPositions)
 	{
 		EngineL::Soul* soul = new EngineL::Soul(position.x, position.y);
@@ -312,7 +316,10 @@ void GameManager::collectSouls()
 
 		if (EngineL::CollisionManager::checkCollision(&player, soul))
 		{
-			player.addSouls(soul->getValue() * player.GetStats().difficulty);
+			int amount = soul->getValue() * player.GetStats().difficulty;
+
+			player.addSouls(amount);
+			soulsThisRun += amount;
 
 			updateManager.remove(soul);
 			renderManager.remove(soul);
@@ -351,12 +358,27 @@ void GameManager::collectWeaponPickups()
 	}
 }
 
+void GameManager::updateRecords()
+{
+	if (runTime > bestTime)
+		bestTime = runTime;
+
+	if (killsThisRun > bestKills)
+		bestKills = killsThisRun;
+
+	if (soulsThisRun > bestSouls)
+		bestSouls = soulsThisRun;
+}
+
 void GameManager::startNewRun()
 {
 
 	showSkillTree = false;
 	maxRunTime = player.getMaxTime();
 	runTime = 0.f;
+
+	killsThisRun = 0;
+	soulsThisRun = 0;
 
 	player.setPosition(400.f, 300.f);
 	player.resetDamageCooldown();
@@ -413,5 +435,8 @@ void GameManager::renderGameScene()
 		weaponInventory.getCurrentWeapon(),
 		runTime,
 		maxRunTime,
-		player.hasSecondWeaponSlot());
+		player.hasSecondWeaponSlot(),
+		bestTime,
+		bestKills,
+		bestSouls);
 }

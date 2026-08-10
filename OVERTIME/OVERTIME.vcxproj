@@ -179,7 +179,6 @@
     <ClCompile Include="Language.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMenuScreen.cpp" />
-    <ClCompile Include="Map.cpp" />
     <ClCompile Include="MeleeEnemy.cpp" />
     <ClCompile Include="PauseScreen.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -208,7 +207,6 @@
     <ClInclude Include="KamikazeEnemy.h" />
     <ClInclude Include="Language.h" />
     <ClInclude Include="MainMenuScreen.h" />
-    <ClInclude Include="Map.h" />
     <ClInclude Include="MeleeEnemy.h" />
     <ClInclude Include="PauseScreen.h" />
     <ClInclude Include="Player.h" />

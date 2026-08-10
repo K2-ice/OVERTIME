@@ -1,17 +1,13 @@
 #pragma once
-
 #include <string>
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
-
 #include "Player.h"
 #include "Weapon.h"
 #include "Language.h"
 
 class HUD {
-
 public:
-
 	HUD(sf::Font& font);
 
 	void draw(
@@ -20,11 +16,12 @@ public:
 		EngineL::Weapon* weapon,
 		float runTime,
 		float maxRunTime,
-		bool hasSecondWeaponSlot);
+		bool hasSecondWeaponSlot,
+		float bestTime,
+		int bestKills,
+		int bestSouls);
 
 private:
-
 	std::string formatTime(float seconds) const;
-
 	sf::Font& font;
 };

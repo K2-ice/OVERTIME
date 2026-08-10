@@ -44,6 +44,7 @@ namespace EngineL {
 
 		std::vector<Enemy*> enemies;
 		std::vector<Bullet*> enemyBullets;
+		sf::Vector2f getRandomSpawnPosition() const;
 
 		float spawnTimer = 0.f;
 		float spawnDelay = 1.f;
