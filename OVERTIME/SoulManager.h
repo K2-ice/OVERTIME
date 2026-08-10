@@ -5,12 +5,14 @@
 
 namespace EngineL
 {
-	class SoulManager
-	{
+	class SoulManager	{
+
 	public:
+
 		std::vector<Soul*>& getSouls();
 
 	private:
+
 		std::vector<Soul*> souls;
 	};
 }

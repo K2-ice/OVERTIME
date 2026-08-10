@@ -8,7 +8,7 @@
 GameManager::GameManager()
 	: engine(1280, 720, "OVERTIME")
 	, player(400.f, 300.f, &engine.getInputManager(), &map)
-	, enemyManager(updateManager, renderManager, &player)
+	, enemyManager(updateManager, renderManager, &player, &map)
 	, hud(font)
 	, sceneManager(font)
 {
@@ -43,13 +43,38 @@ GameManager::GameManager()
 		}
 	}
 
-	layout[5][10] = 42;
-	layout[5][11] = 42;
-	layout[5][12] = 42;
-	layout[10][20] = 42;
-	layout[10][21] = 42;
-	layout[15][5] = 42;
-	layout[15][6] = 42;
+	for (int y = 6; y <= 12; y++)
+	{
+		if (y != 9)
+			layout[y][15] = 42;
+	}
+
+	// Bloc central (obstacle plein)
+	for (int y = 10; y <= 13; y++)
+	{
+		for (int x = 20; x <= 24; x++)
+		{
+			layout[y][x] = 42;
+		}
+	}
+
+	// Couloir en zigzag
+	for (int x = 25; x <= 35; x++)
+	{
+		layout[16][x] = 42;
+	}
+	for (int x = 25; x <= 35; x++)
+	{
+		layout[18][x] = 42;
+	}
+
+	// Piliers epars
+	layout[3][30] = 42;
+	layout[3][32] = 42;
+	layout[3][34] = 42;
+	layout[20][8] = 42;
+	layout[20][10] = 42;
+	layout[20][12] = 42;
 
 	map.load(layout, "Assets/Tiles/");
 }

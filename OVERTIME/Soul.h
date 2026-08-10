@@ -4,9 +4,10 @@
 
 namespace EngineL
 {
-	class Soul : public Entity
-	{
+	class Soul : public Entity	{
+
 	public:
+
 		Soul(float x, float y, int value = 1);
 
 		void update(float deltaTime) override;
@@ -17,6 +18,7 @@ namespace EngineL
 		int getValue() const;
 
 	private:
+
 		int value;
 		bool collected = false;
 	};

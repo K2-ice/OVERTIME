@@ -5,10 +5,11 @@
 #include "SkillNode.h"
 #include "Player.h"
 #include "WeaponInventory.h"
+
 using EngineL::Player;
 
-class SkillTree
-{
+class SkillTree {
+
 public:
 
 	SkillTree();

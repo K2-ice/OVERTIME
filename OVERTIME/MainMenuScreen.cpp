@@ -6,10 +6,10 @@ namespace
 	const sf::FloatRect kContinueButtonBounds({ 490.f, 260.f }, { 300.f, 70.f });
 	const sf::FloatRect kPlayButtonBounds({ 490.f, 350.f }, { 300.f, 70.f });
 	const sf::FloatRect kSettingsButtonBounds({ 490.f, 440.f }, { 300.f, 70.f });
+	const sf::FloatRect kQuitButtonBounds({ 490.f, 530.f }, { 300.f, 70.f });
 }
 
-MainMenuScreen::MainMenuScreen(sf::Font& font)
-	: font(font)
+MainMenuScreen::MainMenuScreen(sf::Font& font): font(font)
 {
 }
 
@@ -36,6 +36,8 @@ MainMenuAction MainMenuScreen::handleInput(EngineL::InputManager& input, const s
 			action = MainMenuAction::Play;
 		else if (kSettingsButtonBounds.contains(mouse))
 			action = MainMenuAction::Settings;
+		else if (kQuitButtonBounds.contains(mouse))
+			action = MainMenuAction::Quit;
 	}
 
 	if (!pressed)
@@ -44,13 +46,12 @@ MainMenuAction MainMenuScreen::handleInput(EngineL::InputManager& input, const s
 	return action;
 }
 
-void MainMenuScreen::render(sf::RenderWindow& window)
-{
+void MainMenuScreen::render(sf::RenderWindow& window) {
 	bool isFrench = Language::current == LanguageOption::French;
 
 	sf::Text title(font);
 	title.setCharacterSize(60);
-	title.setFillColor(sf::Color::White);
+	title.setFillColor(sf::Color::Magenta);
 	title.setString("OVERTIME");
 
 	sf::FloatRect titleBounds = title.getLocalBounds();
@@ -59,6 +60,7 @@ void MainMenuScreen::render(sf::RenderWindow& window)
 		120.f
 		});
 	window.draw(title);
+
 
 	if (savedSouls > 0)
 	{
@@ -71,6 +73,7 @@ void MainMenuScreen::render(sf::RenderWindow& window)
 
 	drawButton(window, kPlayButtonBounds, isFrench ? "Nouvelle partie" : "New game");
 	drawButton(window, kSettingsButtonBounds, isFrench ? "Parametres" : "Settings");
+	drawButton(window, kQuitButtonBounds, isFrench ? "Quitter" : "Quit");
 }
 
 void MainMenuScreen::drawButton(sf::RenderWindow& window, const sf::FloatRect& bounds, const std::string& label)

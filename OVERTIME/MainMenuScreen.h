@@ -3,17 +3,19 @@
 #include "InputManager.h"
 #include "Language.h"
 
-enum class MainMenuAction
-{
+enum class MainMenuAction {
+
 	None,
 	Play,
 	Continue,
-	Settings
+	Settings,
+	Quit
 };
 
-class MainMenuScreen
-{
+class MainMenuScreen {
+
 public:
+
 	MainMenuScreen(sf::Font& font);
 
 	void setSavedSouls(int souls);
@@ -22,6 +24,7 @@ public:
 	void render(sf::RenderWindow& window);
 
 private:
+
 	void drawButton(sf::RenderWindow& window, const sf::FloatRect& bounds, const std::string& label);
 
 	sf::Font& font;

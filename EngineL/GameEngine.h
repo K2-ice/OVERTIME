@@ -5,9 +5,10 @@
 
 namespace EngineL {
 
-	class GameEngine
-	{
+	class GameEngine {
+
 	public:
+
 		GameEngine(unsigned int width, unsigned int height, const std::string& title);
 
 		bool isRunning();

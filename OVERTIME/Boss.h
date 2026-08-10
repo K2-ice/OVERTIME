@@ -3,12 +3,12 @@
 #include "Bullet.h"
 #include <vector>
 
-namespace EngineL
-{
+namespace EngineL {
+
 	class Boss : public Enemy
 	{
 	public:
-		Boss(float x, float y, Player* player, float difficulty);
+		Boss(float x, float y, Player* player, float difficulty, Map* map);
 
 		void update(float deltaTime) override;
 

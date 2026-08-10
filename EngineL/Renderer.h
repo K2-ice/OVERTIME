@@ -3,8 +3,7 @@
 
 namespace EngineL {
 
-	class Renderer
-	{
+	class Renderer {
 	public:
 		Renderer(sf::RenderWindow& window);
 
@@ -14,6 +13,7 @@ namespace EngineL {
 		void drawText(const sf::Text& text);
 
 	private:
+
 		sf::RenderWindow& window;
 	};
 }

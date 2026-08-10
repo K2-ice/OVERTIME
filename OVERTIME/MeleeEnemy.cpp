@@ -3,8 +3,8 @@
 
 namespace EngineL
 {
-	MeleeEnemy::MeleeEnemy(float x, float y, Player* player, float difficulty)
-		: Enemy(x, y, player, difficulty)
+	MeleeEnemy::MeleeEnemy(float x, float y, Player* player, float difficulty, Map* map)
+		: Enemy(x, y, player, difficulty, map)
 	{
 		Stats s;
 		if (difficulty == 1) {

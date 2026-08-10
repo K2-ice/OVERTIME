@@ -19,9 +19,10 @@
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/View.hpp>
 
-class GameManager
-{
+class GameManager {
+
 public:
+
 	GameManager();
 	~GameManager();
 	void run();

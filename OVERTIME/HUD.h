@@ -8,9 +8,10 @@
 #include "Weapon.h"
 #include "Language.h"
 
-class HUD
-{
+class HUD {
+
 public:
+
 	HUD(sf::Font& font);
 
 	void draw(
@@ -22,6 +23,7 @@ public:
 		bool hasSecondWeaponSlot);
 
 private:
+
 	std::string formatTime(float seconds) const;
 
 	sf::Font& font;

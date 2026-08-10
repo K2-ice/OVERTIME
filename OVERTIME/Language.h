@@ -1,14 +1,15 @@
 #pragma once
 
-enum class LanguageOption
-{
+enum class LanguageOption {
+
 	French,
 	English
 };
 
-class Language
-{
+class Language {
+
 public:
+
 	static LanguageOption current;
 
 	static void toggle();

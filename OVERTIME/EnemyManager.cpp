@@ -6,10 +6,11 @@
 
 namespace EngineL
 {
-	EnemyManager::EnemyManager(UpdateManager& updateManager, RenderManager& renderManager, Player* player)
+	EnemyManager::EnemyManager(UpdateManager& updateManager, RenderManager& renderManager, Player* player, Map* map)
 		: updateManager(updateManager)
 		, renderManager(renderManager)
-		, player(player)
+		, player(player),
+		map(map)
 	{
 	}
 
@@ -51,19 +52,19 @@ namespace EngineL
 
 		if (roll < 45)
 		{
-			enemy = new Enemy(x, y, player, player->GetStats().difficulty);           // Basique : 45%
+			enemy = new Enemy(x, y, player, player->GetStats().difficulty, map);           // Basique : 45%
 		}
 		else if (roll < 65)
 		{
-			enemy = new KamikazeEnemy(x, y, player, player->GetStats().difficulty);    // Kamikaze : 20%
+			enemy = new KamikazeEnemy(x, y, player, player->GetStats().difficulty, map);    // Kamikaze : 20%
 		}
 		else if (roll < 85)
 		{
-			enemy = new MeleeEnemy(x, y, player, player->GetStats().difficulty);       // Corps a corps : 20%
+			enemy = new MeleeEnemy(x, y, player, player->GetStats().difficulty, map);       // Corps a corps : 20%
 		}
 		else
 		{
-			enemy = new BelierEnemy(x, y, player, player->GetStats().difficulty);         // Belier : 15%
+			enemy = new BelierEnemy(x, y, player, player->GetStats().difficulty, map);         // Belier : 15%
 		}
 
 		enemies.push_back(enemy);
@@ -83,7 +84,7 @@ namespace EngineL
 		float x = playerPosition.x + std::cos(angle) * 500.f;
 		float y = playerPosition.y + std::sin(angle) * 500.f;
 
-		boss = new Boss(x, y, player, player->GetStats().difficulty);
+		boss = new Boss(x, y, player, player->GetStats().difficulty, map);
 
 		enemies.push_back(boss);
 

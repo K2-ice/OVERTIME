@@ -5,7 +5,7 @@
 
 namespace EngineL
 {
-	Enemy::Enemy(float x, float y, Player* player, float difficulty)
+	Enemy::Enemy(float x, float y, Player* player, float difficulty, Map* map)
 		: Entity(x, y, 32.f, 32.f, sf::Color::Red)
 	{
 		this->player = player;
@@ -103,5 +103,31 @@ namespace EngineL
 
 		move(dx * GetStats().speed * speedMultiplier * deltaTime,
 			dy * GetStats().speed * speedMultiplier * deltaTime);
+	}
+
+	bool Enemy::tryMove(float moveX, float moveY) {
+
+		float width = 32.f;
+		float height = 32.f;
+
+		bool moved = false;
+
+		sf::Vector2f position = getPosition();
+		float newX = position.x + moveX;
+
+		if (map == nullptr || !map->isWallArea(newX, position.y, width, height)) {
+			setPosition(newX, position.y);
+			moved = true;
+		}
+
+		position = getPosition();
+		float newY = position.y + moveY;
+
+		if (map == nullptr || !map->isWallArea(position.x, newY, width, height)) {
+			setPosition(position.x, newY);
+			moved = true;
+		}
+
+		return moved;
 	}
 }

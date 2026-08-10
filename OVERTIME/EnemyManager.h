@@ -11,12 +11,15 @@
 #include "UpdateManager.h"
 #include "RenderManager.h"
 #include "CollisionManager.h"
-namespace EngineL
-{
-	class EnemyManager
-	{
+#include "Map.h"
+
+namespace EngineL {
+
+	class EnemyManager {
+
 	public:
-		EnemyManager(UpdateManager& updateManager, RenderManager& renderManager, Player* player);
+
+		EnemyManager(UpdateManager& updateManager, RenderManager& renderManager, Player* player, Map* map);
 		std::vector<Enemy*>& getEnemies();
 
 		void update(float deltaTime, float runTime);
@@ -28,6 +31,7 @@ namespace EngineL
 		void clear();
 
 	private:
+
 		void spawnEnemy();
 		void spawnBoss();
 		void updateBossAttacks();
@@ -36,6 +40,7 @@ namespace EngineL
 		UpdateManager& updateManager;
 		RenderManager& renderManager;
 		Player* player;
+		Map* map;
 
 		std::vector<Enemy*> enemies;
 		std::vector<Bullet*> enemyBullets;

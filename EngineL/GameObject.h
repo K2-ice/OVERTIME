@@ -3,8 +3,7 @@
 
 namespace EngineL {
 
-	class GameObject
-	{
+	class GameObject {
 	public:
 		virtual ~GameObject() {}
 

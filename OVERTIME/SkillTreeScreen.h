@@ -7,8 +7,8 @@
 #include <algorithm>
 #include <array>
 
-enum class SkillTreeAction
-{
+enum class SkillTreeAction {
+
 	None,
 	Back,
 	RestartRun
@@ -28,6 +28,8 @@ public:
 		EngineL::Player& player,
 		WeaponInventory& weaponInventory
 	);
+
+	void render(sf::RenderWindow& window, const EngineL::Player& player);
 
 	void render(
 		sf::RenderWindow& window,

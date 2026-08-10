@@ -6,9 +6,10 @@
 
 namespace EngineL
 {
-	class Weapon
-	{
+	class Weapon {
+
 	public:
+
 		Weapon(const WeaponStats& stats);
 
 		void update(float deltaTime);
@@ -28,6 +29,7 @@ namespace EngineL
 		void increaseCapacity(float magazineIncrease, float reserveIncrease);
 
 	private:
+
 		std::string name;
 		float fireRate;
 		float damage;

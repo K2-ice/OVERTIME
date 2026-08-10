@@ -5,8 +5,8 @@
 
 namespace EngineL
 {
-	Weapon::Weapon(const WeaponStats& stats)
-	{
+	Weapon::Weapon(const WeaponStats& stats) {
+
 		name = stats.name;
 		fireRate = stats.fireRate;
 		damage = stats.damage;
@@ -23,28 +23,25 @@ namespace EngineL
 
 	void Weapon::update(float deltaTime)
 	{
-		if (cooldown > 0.f)
-		{
+		if (cooldown > 0.f) {
 			cooldown -= deltaTime;
 
 			if (cooldown < 0.f)
 				cooldown = 0.f;
 		}
 
-		if (reloading)
-		{
+		if (reloading) {
+
 			reloadTimer -= deltaTime;
 
-			if (reloadTimer <= 0.f)
-			{
+			if (reloadTimer <= 0.f) {
 				reloading = false;
 
-				if (infiniteReserve)
-				{
+				if (infiniteReserve) {
 					currentAmmo = magazineSize;
 				}
-				else
-				{
+
+				else {
 					int needed = magazineSize - currentAmmo;
 					int amountToLoad = std::min(needed, reserveAmmo);
 
@@ -55,13 +52,12 @@ namespace EngineL
 		}
 	}
 
-	bool Weapon::canFire() const
-	{
+	bool Weapon::canFire() const {
 		return cooldown <= 0.f && !reloading && currentAmmo > 0;
 	}
 
-	std::vector<Bullet*> Weapon::fire(float x, float y, float dirX, float dirY, float damageBonus, float fireRateBonus)
-	{
+	std::vector<Bullet*> Weapon::fire(float x, float y, float dirX, float dirY, float damageBonus, float fireRateBonus) {
+
 		std::vector<Bullet*> bullets;
 
 		if (!canFire())
@@ -70,20 +66,20 @@ namespace EngineL
 		cooldown = 1.f / (fireRate * fireRateBonus);
 		currentAmmo--;
 
-		if (pelletCount <= 1)
-		{
+		if (pelletCount <= 1) {
 			bullets.push_back(new Bullet(x, y, dirX, dirY, damage + damageBonus));
 		}
-		else
-		{
+
+		else {
+
 			float baseAngle = std::atan2(dirY, dirX);
 			float spreadRadians = spreadAngleDegrees * (3.14159265f / 180.f);
 
 			float startAngle = baseAngle - spreadRadians * 0.5f;
 			float angleStep = spreadRadians / (pelletCount - 1);
 
-			for (int i = 0; i < pelletCount; i++)
-			{
+			for (int i = 0; i < pelletCount; i++) {
+
 				float angle = startAngle + angleStep * i;
 				float pelletDirX = std::cos(angle);
 				float pelletDirY = std::sin(angle);
@@ -95,8 +91,7 @@ namespace EngineL
 		return bullets;
 	}
 
-	void Weapon::startReload(float reloadspeed)
-	{
+	void Weapon::startReload(float reloadspeed) {
 		if (reloading)
 			return;
 
@@ -109,8 +104,8 @@ namespace EngineL
 		reloading = true;
 		reloadTimer = reloadTime * reloadspeed;
 	}
-	void Weapon::resetAmmo()
-	{
+
+	void Weapon::resetAmmo() {
 		currentAmmo = magazineSize;
 		if (!infiniteReserve)
 			reserveAmmo = maxReserveAmmo;
@@ -118,13 +113,12 @@ namespace EngineL
 		reloadTimer = 0.f;
 		cooldown = 0.f;
 	};
-	bool Weapon::isReloading() const
-	{
+
+	bool Weapon::isReloading() const {
 		return reloading;
 	}
 
-	void Weapon::increaseCapacity(float magazineIncrease, float reserveIncrease)
-	{
+	void Weapon::increaseCapacity(float magazineIncrease, float reserveIncrease) {
 		magazineSize += static_cast<int>(magazineIncrease);
 		maxReserveAmmo += static_cast<int>(reserveIncrease);
 
@@ -134,28 +128,23 @@ namespace EngineL
 			reserveAmmo = maxReserveAmmo;
 	}
 
-	std::string Weapon::getName() const
-	{
+	std::string Weapon::getName() const {
 		return name;
 	}
 
-	int Weapon::getCurrentAmmo() const
-	{
+	int Weapon::getCurrentAmmo() const {
 		return currentAmmo;
 	}
 
-	int Weapon::getMagazineSize() const
-	{
+	int Weapon::getMagazineSize() const {
 		return magazineSize;
 	}
 
-	int Weapon::getReserveAmmo() const
-	{
+	int Weapon::getReserveAmmo() const {
 		return reserveAmmo;
 	}
 
-	bool Weapon::hasInfiniteReserve() const
-	{
+	bool Weapon::hasInfiniteReserve() const {
 		return infiniteReserve;
 	}
 }
