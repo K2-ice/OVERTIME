@@ -170,6 +170,7 @@ void SkillTree::Buy(int index, Player& player, WeaponInventory& weaponInventory)
 
 	case SkillType::Difficulty:
 		stats.difficulty += static_cast<int>(node.amount);
+		stats.maxDifficulty = std::max(stats.maxDifficulty, stats.difficulty);
 		break;
 
 	case SkillType::WeaponSlot:

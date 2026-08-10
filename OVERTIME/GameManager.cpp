@@ -33,18 +33,16 @@ GameManager::GameManager()
 
 			if (border)
 			{
-				layout[y][x] = 42; // mur
+				layout[y][x] = 42;
 			}
 			else
 			{
-				// sol en herbe, avec un peu de variete (1,2,3,4)
 				int variant = (x + y) % 4;
 				layout[y][x] = 1 + variant;
 			}
 		}
 	}
 
-	// Quelques murs interieurs pour tester la collision
 	layout[5][10] = 42;
 	layout[5][11] = 42;
 	layout[5][12] = 42;
@@ -126,8 +124,6 @@ void GameManager::update(float deltaTime)
 
 		return;
 	}
-
-	// etat "Playing"
 
 	if (engine.getInputManager().isPausePressed())
 	{

@@ -13,12 +13,35 @@ SkillTreeScreen::SkillTreeScreen(sf::Font& font)
 {
 	treeView.setSize({ 1280.f, 720.f });
 	treeView.setCenter({ 300.f, 100.f });
+	difficultyButtonBounds[0] = {
+		{ 40.f, 620.f },
+		{ 50.f, 50.f }
+	};
+
+	difficultyButtonBounds[1] = {
+		{ 100.f, 620.f },
+		{ 50.f, 50.f }
+	};
+
+	difficultyButtonBounds[2] = {
+		{ 160.f, 620.f },
+		{ 50.f, 50.f }
+	};
+
+	difficultyButtonBounds[3] = {
+		{ 220.f, 620.f },
+		{ 50.f, 50.f }
+	};
 }
 
 void SkillTreeScreen::setDuringRun(bool duringRun)
 {
 	this->duringRun = duringRun;
 	pendingNodeIndex = -1;
+	pendingDifficulty = -1;
+
+	if (duringRun)
+		WarningShown = false;
 }
 
 bool SkillTreeScreen::isDuringRun() const
@@ -35,13 +58,28 @@ bool SkillTreeScreen::canAfford(
 		&& player.getSouls() >= node.cost;
 }
 
+bool SkillTreeScreen::isDifficultyUnlocked(
+	int difficulty, const EngineL::Player& player)
+{
+	const auto& nodes = skillTree.GetNodes();
+
+	for (const auto& node : nodes)
+	{
+		if (player.GetStats().maxDifficulty >= difficulty)
+		{
+			return node.unlocked;
+		}
+	}
+
+	return difficulty == 1;
+}
+
 SkillTreeAction SkillTreeScreen::handleInput(
 	EngineL::InputManager& input,
 	const sf::RenderWindow& window,
 	EngineL::Player& player,
 	WeaponInventory& weaponInventory)
 {
-
 	float wheel = input.getMouseWheelDelta();
 
 	if (wheel > 0.f)
@@ -60,7 +98,6 @@ SkillTreeAction SkillTreeScreen::handleInput(
 		input.isMouseButtonPressed(sf::Mouse::Button::Left);
 
 	SkillTreeAction action = SkillTreeAction::None;
-
 
 	if (pressed && !leftPressed)
 	{
@@ -106,11 +143,9 @@ SkillTreeAction SkillTreeScreen::handleInput(
 		}
 	}
 
-
 	if (!pressed && leftPressed)
 	{
 		leftPressed = false;
-
 
 		if (!dragging)
 		{
@@ -121,7 +156,31 @@ SkillTreeAction SkillTreeScreen::handleInput(
 				static_cast<float>(mousePixel.x),
 				static_cast<float>(mousePixel.y));
 
-			if (pendingNodeIndex != -1)
+			if (pendingDifficulty != -1 && pendingDifficulty != -2)
+			{
+				if (kConfirmButtonBounds.contains(screenMouse))
+				{
+					player.GetStats().difficulty =
+						pendingDifficulty;
+
+					WarningShown = true;
+					duringRun = false;
+					pendingDifficulty = -1;
+
+					return SkillTreeAction::None;
+				}
+
+				if (kCancelButtonBounds.contains(screenMouse))
+				{
+					WarningShown = false;
+					pendingDifficulty = -1;
+				}
+
+				dragging = false;
+				return SkillTreeAction::None;
+			}
+
+			if (pendingNodeIndex != -1 && pendingNodeIndex != -2)
 			{
 				if (kConfirmButtonBounds.contains(screenMouse))
 				{
@@ -129,67 +188,103 @@ SkillTreeAction SkillTreeScreen::handleInput(
 						pendingNodeIndex,
 						player,
 						weaponInventory);
-
+					WarningShown = true;
+					duringRun = false;
 					pendingNodeIndex = -1;
 
-					action = SkillTreeAction::RestartRun;
+					return SkillTreeAction::None;
 				}
-				else if (kCancelButtonBounds.contains(screenMouse))
+
+				if (kCancelButtonBounds.contains(screenMouse))
 				{
+					WarningShown = false;
 					pendingNodeIndex = -1;
 				}
+
+				dragging = false;
+				return SkillTreeAction::None;
 			}
 
-
-			else if (
-				duringRun &&
+			if (duringRun &&
 				kBackButtonBounds.contains(screenMouse))
 			{
-				action = SkillTreeAction::Back;
+				dragging = false;
+				return SkillTreeAction::Back;
 			}
 
-
-			else
+			for (int i = 0; i < 4; i++)
 			{
-				sf::Vector2f mouse =
-					window.mapPixelToCoords(
-						mousePixel,
-						treeView);
+				if (!difficultyButtonBounds[i].contains(screenMouse))
+					continue;
 
-				auto& nodes =
-					skillTree.GetNodes();
+				int newDifficulty = i + 1;
 
-				for (size_t i = 0;
-					i < nodes.size();
-					i++)
+				if (!isDifficultyUnlocked(newDifficulty, player))
 				{
-					float dx =
-						mouse.x - nodes[i].position.x;
+					dragging = false;
+					return SkillTreeAction::None;
+				}
 
-					float dy =
-						mouse.y - nodes[i].position.y;
+				if (newDifficulty == player.GetStats().difficulty)
+				{
+					dragging = false;
+					return SkillTreeAction::None;
+				}
 
-					if (dx * dx + dy * dy <=
-						20.f * 20.f)
+				if (duringRun)
+				{
+					pendingDifficulty = newDifficulty;
+				}
+				else
+				{
+					player.GetStats().difficulty = newDifficulty;
+				}
+
+				dragging = false;
+				return SkillTreeAction::None;
+			}
+
+			sf::Vector2f mouse =
+				window.mapPixelToCoords(
+					mousePixel,
+					treeView);
+
+			auto& nodes =
+				skillTree.GetNodes();
+
+			for (size_t i = 0;
+				i < nodes.size();
+				i++)
+			{
+				float dx =
+					mouse.x - nodes[i].position.x;
+
+				float dy =
+					mouse.y - nodes[i].position.y;
+
+				if (dx * dx + dy * dy <=
+					20.f * 20.f)
+				{
+					if (!canAfford(
+						nodes[i],
+						player))
 					{
-						if (!canAfford(nodes[i], player))
-							break;
-
-						if (duringRun)
-						{
-							pendingNodeIndex =
-								static_cast<int>(i);
-						}
-						else
-						{
-							skillTree.Buy(
-								static_cast<int>(i),
-								player,
-								weaponInventory);
-						}
-
 						break;
 					}
+
+					if (duringRun)
+					{
+						pendingNodeIndex = static_cast<int>(i);
+					}
+					else
+					{
+						skillTree.Buy(
+							static_cast<int>(i),
+							player,
+							weaponInventory);
+					}
+
+					break;
 				}
 			}
 		}
@@ -197,13 +292,21 @@ SkillTreeAction SkillTreeScreen::handleInput(
 		dragging = false;
 	}
 
-
 	return action;
 }
-
 void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& player)
 {
 	window.setView(window.getDefaultView());
+
+	sf::RectangleShape background;
+	background.setSize({
+		static_cast<float>(window.getSize().x),
+		static_cast<float>(window.getSize().y)
+		});
+
+	background.setFillColor(sf::Color(218, 190, 140));
+
+	window.draw(background);
 
 	bool isFrench = Language::current == LanguageOption::French;
 
@@ -227,9 +330,8 @@ void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& pl
 		20.f
 		});
 	window.draw(text);
+	if (!duringRun){
 
-	if (!duringRun)
-	{
 		text.setCharacterSize(24);
 		text.setFillColor(sf::Color::White);
 		text.setString(isFrench ? "Appuyez sur ENTREE\npour commencer" : "Press ENTER\nTo Start Run");
@@ -240,6 +342,67 @@ void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& pl
 			static_cast<float>(window.getSize().y) - bounds.size.y - 30.f
 			});
 		window.draw(text);
+	}
+
+	if (pendingDifficulty != -1 && pendingDifficulty != -2)
+	{
+		sf::RectangleShape box;
+		box.setSize({ 420.f, 180.f });
+		box.setPosition({
+			static_cast<float>(window.getSize().x) / 2.f - 210.f,
+			static_cast<float>(window.getSize().y) / 2.f - 90.f
+			});
+
+		box.setFillColor(sf::Color(25, 25, 25, 245));
+		box.setOutlineThickness(3.f);
+		box.setOutlineColor(sf::Color::White);
+
+		window.draw(box);
+
+		sf::Text warning(font);
+		warning.setCharacterSize(22);
+		warning.setFillColor(sf::Color::White);
+
+		std::string message;
+
+		if (isFrench)
+		{
+			message =
+				"Changer la difficulte\n"
+				"arretera le run.\n\n"
+				"Continuer ?";
+		}
+		else
+		{
+			message =
+				"Changing difficulty\n"
+				"will stop the run.\n\n"
+				"Continue?";
+		}
+
+		warning.setString(message);
+
+		sf::FloatRect bounds =
+			warning.getLocalBounds();
+
+		warning.setPosition({
+			static_cast<float>(window.getSize().x) / 2.f
+				- bounds.size.x / 2.f,
+			static_cast<float>(window.getSize().y) / 2.f
+				- bounds.size.y / 2.f
+			});
+
+		window.draw(warning);
+
+		drawButton(
+			window,
+			kConfirmButtonBounds,
+			isFrench ? "Confirmer" : "Confirm");
+
+		drawButton(
+			window,
+			kCancelButtonBounds,
+			isFrench ? "Annuler" : "Cancel");
 	}
 
 	window.setView(treeView);
@@ -414,35 +577,139 @@ void SkillTreeScreen::render(sf::RenderWindow& window, const EngineL::Player& pl
 	}
 	window.setView(window.getDefaultView());
 
-	if (duringRun)
+	if (duringRun && !WarningShown)
 	{
 		drawButton(window, kBackButtonBounds, isFrench ? "Retour" : "Back");
 	}
 
-	if (pendingNodeIndex != -1)
+	drawDifficultySelector(window, player);
+
+	if (pendingNodeIndex != -1 && pendingNodeIndex != -2)
 	{
 		drawConfirmPopup(window);
 	}
 }
 
+void SkillTreeScreen::drawDifficultySelector(
+	sf::RenderWindow& window,
+	const EngineL::Player& player)
+{
+	bool isFrench =
+		Language::current == LanguageOption::French;
+
+	sf::Text title(font);
+	title.setCharacterSize(20);
+	title.setFillColor(sf::Color::White);
+
+	title.setString(
+		isFrench ? "Difficulte" : "Difficulty");
+
+	title.setPosition({ 40.f, 585.f });
+
+	window.draw(title);
+
+	for (int i = 0; i < 4; i++)
+	{
+		int difficulty = i + 1;
+
+		bool unlocked =
+			isDifficultyUnlocked(difficulty, player);
+
+		sf::RectangleShape button({
+			50.f,
+			50.f
+			});
+
+		button.setPosition({
+			40.f + i * 60.f,
+			620.f
+			});
+
+		if (!unlocked)
+		{
+			button.setFillColor(
+				sf::Color(40, 40, 40));
+			button.setOutlineColor(
+				sf::Color(70, 70, 70));
+		}
+		else if (player.GetStats().difficulty == difficulty)
+		{
+			button.setFillColor(
+				sf::Color(255, 215, 0));
+			button.setOutlineColor(
+				sf::Color::White);
+		}
+		else
+		{
+			button.setFillColor(
+				sf::Color(80, 80, 80));
+			button.setOutlineColor(
+				sf::Color::White);
+		}
+
+		button.setOutlineThickness(2.f);
+
+		window.draw(button);
+
+		sf::Text number(font);
+		number.setCharacterSize(24);
+
+		if (unlocked)
+		{
+			number.setFillColor(sf::Color::White);
+		}
+		else
+		{
+			number.setFillColor(
+				sf::Color(100, 100, 100));
+		}
+
+		number.setString(
+			std::to_string(difficulty));
+
+		sf::FloatRect bounds =
+			number.getLocalBounds();
+
+		number.setPosition({
+			40.f + i * 60.f +
+				25.f - bounds.size.x / 2.f,
+			620.f +
+				25.f - bounds.size.y / 2.f -
+				5.f
+			});
+
+		window.draw(number);
+
+		difficultyButtonBounds[i] =
+			button.getGlobalBounds();
+	}
+}
+
 void SkillTreeScreen::drawConfirmPopup(sf::RenderWindow& window)
 {
-	bool isFrench = Language::current == LanguageOption::French;
+	window.setView(window.getDefaultView());
+
+	bool isFrench =
+		Language::current == LanguageOption::French;
 
 	sf::RectangleShape overlay;
-	overlay.setSize({ static_cast<float>(window.getSize().x), static_cast<float>(window.getSize().y) });
-	overlay.setFillColor(sf::Color(0, 0, 0, 180));
+	overlay.setSize({
+		static_cast<float>(window.getSize().x),
+		static_cast<float>(window.getSize().y)
+		});
+	overlay.setFillColor(sf::Color(218, 190, 140));
 	window.draw(overlay);
 
 	sf::RectangleShape box;
 	box.setSize({ 500.f, 220.f });
 	box.setPosition({
-		window.getSize().x / 2.f - 250.f,
-		window.getSize().y / 2.f - 150.f
+		static_cast<float>(window.getSize().x) / 2.f - 250.f,
+		static_cast<float>(window.getSize().y) / 2.f - 150.f
 		});
 	box.setFillColor(sf::Color(30, 30, 30));
 	box.setOutlineThickness(2.f);
 	box.setOutlineColor(sf::Color::White);
+
 	window.draw(box);
 
 	sf::Text message(font);
@@ -451,18 +718,34 @@ void SkillTreeScreen::drawConfirmPopup(sf::RenderWindow& window)
 
 	message.setString(
 		isFrench
-		? "Debloquer cette competence maintenant\nva relancer la partie en cours.\n\nContinuer ?"
-		: "Unlocking this skill now\nwill restart the current run.\n\nContinue ?");
+		? "Debloquer cette competence maintenant\n"
+		"va relancer la partie en cours.\n\n"
+		"Continuer ?"
+		: "Unlocking this skill now\n"
+		"will restart the current run.\n\n"
+		"Continue ?");
 
-	sf::FloatRect messageBounds = message.getLocalBounds();
+	sf::FloatRect messageBounds =
+		message.getLocalBounds();
+
 	message.setPosition({
-		window.getSize().x / 2.f - messageBounds.size.x / 2.f,
-		window.getSize().y / 2.f - 130.f
+		static_cast<float>(window.getSize().x) / 2.f
+			- messageBounds.size.x / 2.f,
+		static_cast<float>(window.getSize().y) / 2.f
+			- 130.f
 		});
+
 	window.draw(message);
 
-	drawButton(window, kConfirmButtonBounds, isFrench ? "Confirmer" : "Confirm");
-	drawButton(window, kCancelButtonBounds, isFrench ? "Annuler" : "Cancel");
+	drawButton(
+		window,
+		kConfirmButtonBounds,
+		isFrench ? "Confirmer" : "Confirm");
+
+	drawButton(
+		window,
+		kCancelButtonBounds,
+		isFrench ? "Annuler" : "Cancel");
 }
 
 void SkillTreeScreen::drawButton(sf::RenderWindow& window, const sf::FloatRect& bounds, const std::string& label)

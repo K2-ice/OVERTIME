@@ -5,6 +5,7 @@
 #include "InputManager.h"
 #include "Language.h"
 #include <algorithm>
+#include <array>
 
 enum class SkillTreeAction
 {
@@ -13,7 +14,8 @@ enum class SkillTreeAction
 	RestartRun
 };
 
-class SkillTreeScreen {
+class SkillTreeScreen
+{
 public:
 	SkillTreeScreen(sf::Font& font);
 
@@ -26,16 +28,41 @@ public:
 		EngineL::Player& player,
 		WeaponInventory& weaponInventory
 	);
-	void render(sf::RenderWindow& window, const EngineL::Player& player);
+
+	void render(
+		sf::RenderWindow& window,
+		const EngineL::Player& player
+	);
 
 private:
-	bool canAfford(const SkillNode& node, const EngineL::Player& player) const;
-	void drawButton(sf::RenderWindow& window, const sf::FloatRect& bounds, const std::string& label);
-	void drawConfirmPopup(sf::RenderWindow& window);
+	bool canAfford(
+		const SkillNode& node,
+		const EngineL::Player& player
+	) const;
+
+	bool isDifficultyUnlocked(int difficulty, const EngineL::Player& player);
+
+	void drawDifficultySelector(
+		sf::RenderWindow& window,
+		const EngineL::Player& player
+	);
+
+	void drawButton(
+		sf::RenderWindow& window,
+		const sf::FloatRect& bounds,
+		const std::string& label
+	);
+
+	void drawConfirmPopup(
+		sf::RenderWindow& window
+	);
 
 	SkillTree skillTree;
+
 	sf::Font& font;
+
 	bool mouseHeld = false;
+
 	sf::View treeView;
 
 	float zoom = 1.f;
@@ -44,9 +71,17 @@ private:
 
 	bool dragging = false;
 	bool leftPressed = false;
+
 	sf::Vector2i dragStart;
 	sf::Vector2i lastMousePos;
 
 	bool duringRun = false;
+
 	int pendingNodeIndex = -1;
+
+	int pendingDifficulty = -1;
+
+	std::array<sf::FloatRect, 4> difficultyButtonBounds;
+
+	bool WarningShown = false;
 };
