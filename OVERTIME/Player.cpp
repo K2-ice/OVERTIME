@@ -21,7 +21,7 @@ namespace EngineL
 		s.regen = 0.f;
 		s.difficulty = 1;
 		setStats(s);
-		setTexture("Assets/Characters/Survivor 1/survivor1_stand.png");
+		setTexture("Assets/Characters/Survivor 1/survivor1_gun.png");
 	}
 	void Player::update(float deltaTime)
 	{
@@ -49,7 +49,6 @@ namespace EngineL
 		float playerWidth = 32.f;
 		float playerHeight = 32.f;
 
-		// Deplacement horizontal (avec collision mur)
 		sf::Vector2f position = getPosition();
 		float newX = position.x + moveX;
 		if (map == nullptr || !map->isWallArea(newX, position.y, playerWidth, playerHeight))
@@ -57,7 +56,7 @@ namespace EngineL
 			setPosition(newX, position.y);
 		}
 
-		// Deplacement vertical (avec collision mur)
+
 		position = getPosition();
 		float newY = position.y + moveY;
 		if (map == nullptr || !map->isWallArea(position.x, newY, playerWidth, playerHeight))

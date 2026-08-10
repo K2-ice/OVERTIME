@@ -26,6 +26,7 @@ namespace EngineL
 		else if (difficulty == 4)
 			stats.speed *= 2.f;
 		setStats(s);
+		setTexture("Assets/Characters/Man Old/manOld_machine.png");
 	}
 
 	void Boss::update(float deltaTime)

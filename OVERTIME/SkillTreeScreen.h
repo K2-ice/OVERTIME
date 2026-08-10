@@ -14,9 +14,10 @@ enum class SkillTreeAction {
 	RestartRun
 };
 
-class SkillTreeScreen
-{
+class SkillTreeScreen{
+
 public:
+
 	SkillTreeScreen(sf::Font& font);
 
 	void setDuringRun(bool duringRun);
@@ -31,11 +32,7 @@ public:
 
 	void render(sf::RenderWindow& window, const EngineL::Player& player);
 
-	void render(
-		sf::RenderWindow& window,
-		const EngineL::Player& player
-	);
-
+	
 private:
 	bool canAfford(
 		const SkillNode& node,
