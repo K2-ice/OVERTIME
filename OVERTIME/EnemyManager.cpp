@@ -52,19 +52,19 @@ namespace EngineL
 
 		if (roll < 45)
 		{
-			enemy = new Enemy(x, y, player, player->GetStats().difficulty, map);           // Basique : 45%
+			enemy = new Enemy(x, y, player, player->GetStats().difficulty, map);
 		}
 		else if (roll < 65)
 		{
-			enemy = new KamikazeEnemy(x, y, player, player->GetStats().difficulty, map);    // Kamikaze : 20%
+			enemy = new KamikazeEnemy(x, y, player, player->GetStats().difficulty, map);
 		}
 		else if (roll < 85)
 		{
-			enemy = new MeleeEnemy(x, y, player, player->GetStats().difficulty, map);       // Corps a corps : 20%
+			enemy = new MeleeEnemy(x, y, player, player->GetStats().difficulty, map);
 		}
 		else
 		{
-			enemy = new BelierEnemy(x, y, player, player->GetStats().difficulty, map);         // Belier : 15%
+			enemy = new BelierEnemy(x, y, player, player->GetStats().difficulty, map);
 		}
 
 		enemies.push_back(enemy);

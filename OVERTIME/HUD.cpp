@@ -48,7 +48,6 @@ void HUD::draw(
 
 	sf::Text text(font);
 
-	// Chrono
 	text.setCharacterSize(30);
 	text.setFillColor(sf::Color::White);
 	text.setString(formatTime(runTime) + " / " + formatTime(maxRunTime));

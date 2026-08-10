@@ -13,7 +13,6 @@
 #include "RenderManager.h"
 #include "SceneManager.h"
 #include "HUD.h"
-#include <iostream>
 #include "SaveSystem.h"
 #include "Map.h"
 #include <SFML/Graphics/Font.hpp>

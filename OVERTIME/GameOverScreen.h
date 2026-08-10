@@ -8,6 +8,7 @@ enum class GameOverAction {
 
 	None,
 	Retry,
+	SkillTree,
 	QuitToMenu
 };
 

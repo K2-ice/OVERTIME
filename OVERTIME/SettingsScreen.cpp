@@ -4,8 +4,8 @@
 namespace
 {
 	const sf::FloatRect kVolumeMinusBounds({ 490.f, 280.f }, { 50.f, 50.f });
-	const sf::FloatRect kVolumePlusBounds({ 640.f, 280.f }, { 50.f, 50.f });
-	const sf::FloatRect kLanguageButtonBounds({ 490.f, 380.f }, { 200.f, 60.f });
+	const sf::FloatRect kVolumePlusBounds({ 735.f, 280.f }, { 50.f, 50.f });
+	const sf::FloatRect kLanguageButtonBounds({ 490.f, 400.f }, { 300.f, 70.f });
 	const sf::FloatRect kBackButtonBounds({ 490.f, 500.f }, { 300.f, 70.f });
 }
 

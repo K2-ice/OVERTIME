@@ -118,6 +118,11 @@ bool SceneManager::updateMenus(EngineL::InputManager& input, const sf::RenderWin
 			state = GameState::Playing;
 			startNewRun = true;
 		}
+		if (action == GameOverAction::SkillTree)
+		{
+			skillTreeScreen.setDuringRun(false);
+			state = GameState::SkillTree;
+		}
 		else if (action == GameOverAction::QuitToMenu)
 		{
 			state = GameState::MainMenu;

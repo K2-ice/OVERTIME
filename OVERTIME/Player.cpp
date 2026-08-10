@@ -56,7 +56,6 @@ namespace EngineL
 			setPosition(newX, position.y);
 		}
 
-
 		position = getPosition();
 		float newY = position.y + moveY;
 		if (map == nullptr || !map->isWallArea(position.x, newY, playerWidth, playerHeight))
