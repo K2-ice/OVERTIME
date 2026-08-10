@@ -17,7 +17,7 @@ struct Stats {
 	float regen = 0.f;
 
 	int difficulty = 1;
-
+	int maxDifficulty = 1;
 	bool hasShotgun = false;
 	bool hasSubmachinegun = false;
 };

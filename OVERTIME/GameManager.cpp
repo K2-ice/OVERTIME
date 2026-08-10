@@ -151,8 +151,6 @@ void GameManager::update(float deltaTime)
 		return;
 	}
 
-	// etat "Playing"
-
 	if (engine.getInputManager().isPausePressed())
 	{
 		sceneManager.setState(GameState::Paused);

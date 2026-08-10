@@ -75,7 +75,6 @@ void SettingsScreen::render(sf::RenderWindow& window)
 		});
 	window.draw(title);
 
-	// Label "Volume"
 	sf::Text volumeLabel(font);
 	volumeLabel.setCharacterSize(24);
 	volumeLabel.setFillColor(sf::Color::White);
@@ -88,16 +87,12 @@ void SettingsScreen::render(sf::RenderWindow& window)
 		});
 	window.draw(volumeLabel);
 
-	// Bouton -
 	drawButton(window, kVolumeMinusBounds, "-");
 
-	// Bouton +
 	drawButton(window, kVolumePlusBounds, "+");
 
-	// Bouton langue
 	drawButton(window, kLanguageButtonBounds, isFrench ? "Francais" : "English");
 
-	// Bouton Retour
 	drawButton(window, kBackButtonBounds, isFrench ? "Retour" : "Back");
 }
 
