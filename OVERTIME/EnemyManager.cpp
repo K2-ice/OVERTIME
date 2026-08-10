@@ -250,6 +250,41 @@ namespace EngineL
 		enemy->setPosition(enemyPos.x + dx * pushDistance, enemyPos.y + dy * pushDistance);
 	}
 
+	sf::Vector2f EnemyManager::getRandomSpawnPosition() const {
+
+		float mapPixelWidth = static_cast<float>(Map::width * Map::tileSize);
+		float mapPixelHeight = static_cast<float>(Map::height * Map::tileSize);
+
+		sf::Vector2f playerPosition = player->getPosition();
+
+
+		float offsetX = static_cast<float>(rand() % 1000 - 500);
+		float offsetY = static_cast<float>(rand() % 1000 - 500);
+
+		float x = playerPosition.x + offsetX;
+		float y = playerPosition.y + offsetY;
+
+		if (x < 0.f)
+			x = 0.f;
+
+		if (x > mapPixelWidth - 32.f)
+			x = mapPixelWidth - 32.f;
+
+		if (y < 0.f)
+			y = 0.f;
+
+		if (y > mapPixelHeight - 32.f)
+			y = mapPixelHeight - 32.f;
+
+
+		if (map != nullptr && map->isWallArea(x, y, 32.f, 32.f))
+		{
+			return playerPosition;
+		}
+
+		return sf::Vector2f(x, y);
+	}
+
 	std::vector<sf::Vector2f> EnemyManager::removeDeadEnemies()
 	{
 		std::vector<sf::Vector2f> deathPositions;

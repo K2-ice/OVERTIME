@@ -20,15 +20,12 @@
 #include <SFML/Graphics/View.hpp>
 
 class GameManager {
-
 public:
-
 	GameManager();
 	~GameManager();
 	void run();
 
 private:
-
 	void update(float deltaTime);
 	void render();
 	void handleShooting();
@@ -41,7 +38,7 @@ private:
 	void renderGameScene();
 	void collectSouls();
 	void collectWeaponPickups();
-
+	void updateRecords();
 	sf::View getGameView();
 
 	EngineL::GameEngine engine;
@@ -65,10 +62,18 @@ private:
 	float runTime = 0.f;
 	float maxRunTime = player.getMaxTime();
 
-	int	savedSouls = 0;
+	int savedSouls = 0;
+
+	
+	int killsThisRun = 0;
+	int soulsThisRun = 0;
+
+	
+	float bestTime = 0.f;
+	int bestKills = 0;
+	int bestSouls = 0;
 
 	sf::Font font;
-
 	HUD hud;
 	SceneManager sceneManager;
 };

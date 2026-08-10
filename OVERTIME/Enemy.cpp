@@ -101,8 +101,10 @@ namespace EngineL
 			dy /= length;
 		}
 
-		move(dx * GetStats().speed * speedMultiplier * deltaTime,
-			dy * GetStats().speed * speedMultiplier * deltaTime);
+		float moveX = dx * GetStats().speed * speedMultiplier * deltaTime;
+		float moveY = dy * GetStats().speed * speedMultiplier * deltaTime;
+
+		tryMove(moveX, moveY);
 	}
 
 	bool Enemy::tryMove(float moveX, float moveY) {

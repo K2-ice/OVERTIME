@@ -51,8 +51,10 @@ namespace EngineL
 
 	void BelierEnemy::update(float deltaTime)
 	{
-		move(chargeDirX * GetStats().speed * chargeSpeedMultiplier * deltaTime,
-			chargeDirY * GetStats().speed * chargeSpeedMultiplier * deltaTime);
+		float moveX = chargeDirX * GetStats().speed * chargeSpeedMultiplier * deltaTime;
+		float moveY = chargeDirY * GetStats().speed * chargeSpeedMultiplier * deltaTime;
+
+		tryMove(moveX, moveY);
 
 		chargeTimer -= deltaTime;
 

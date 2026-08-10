@@ -53,8 +53,9 @@ namespace EngineL
 		return true;
 	}
 
-	void Map::render(Renderer& renderer)
-	{
+
+	void Map::render(Renderer& renderer)	{
+
 		for (const sf::Sprite& sprite : sprites)
 		{
 			renderer.drawSprite(sprite);
