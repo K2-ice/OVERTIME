@@ -12,13 +12,18 @@ namespace EngineL {
 
 		void update(float deltaTime) override;
 		float getDamage() const;
+		bool hasHitWall() const;
 
 	private:
 
 		float directionX;
 		float directionY;
+
 		float speed = 600.f;
 		float damage;
+		float width;
+		float height;
+		bool hitWall = false;
 		Map* map;
 	};
 }

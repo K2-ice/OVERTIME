@@ -15,7 +15,7 @@ namespace EngineL
 		void update(float deltaTime);
 		bool canFire() const;
 
-		std::vector<Bullet*> fire(float x, float y, float dirX, float dirY, float damageBonus, float fireRateBonus);
+		std::vector<Bullet*> fire(float x, float y, float dirX, float dirY, float damageBonus, float fireRateBonus, Map* map = nullptr);
 
 		void startReload(float reloadspeed);
 		void resetAmmo();

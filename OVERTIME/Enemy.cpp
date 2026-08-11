@@ -9,6 +9,7 @@ namespace EngineL
 		: Entity(x, y, 32.f, 32.f, sf::Color::Red)
 	{
 		this->player = player;
+		this->map = map;
 
 		Stats s;
 		if (difficulty == 1) {

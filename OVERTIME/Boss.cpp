@@ -13,11 +13,13 @@ namespace EngineL
 			s.damage = 20.f;
 			s.maxHealth = 300.f;
 		}
+
 		else {
 			s.health = 300.f * 2 * difficulty;
 			s.damage = 20.f * 2 * difficulty;
 			s.maxHealth = 300.f * 2 * difficulty;
 		}
+
 		s.speed = 90.f;
 		if (difficulty == 2)
 			stats.speed *= 1.25f;
@@ -29,16 +31,15 @@ namespace EngineL
 		setTexture("Assets/Characters/Man Old/manOld_machine.png");
 	}
 
-	void Boss::update(float deltaTime)
-	{
+	void Boss::update(float deltaTime) {
+
 		moveTowardPlayer(deltaTime, 0.6f);
 
-		if (attackTimer > 0.f)
-		{
+		if (attackTimer > 0.f) {
 			attackTimer -= deltaTime;
 		}
-		else
-		{
+
+		else {
 			readyToFire = true;
 			attackTimer = attackCooldown;
 		}
@@ -49,15 +50,15 @@ namespace EngineL
 		return readyToFire;
 	}
 
-	std::vector<Bullet*> Boss::fire()
-	{
+	std::vector<Bullet*> Boss::fire(Map* map) {
+
 		readyToFire = false;
 
 		float dx = player->getPosition().x - getPosition().x;
 		float dy = player->getPosition().y - getPosition().y;
 		float length = std::sqrt(dx * dx + dy * dy);
-		if (length > 0.f)
-		{
+
+		if (length > 0.f) {
 			dx /= length;
 			dy /= length;
 		}
@@ -67,7 +68,7 @@ namespace EngineL
 			dx, dy,
 			GetStats().damage,
 			sf::Color::Magenta,
-			24.f, 24.f);
+			24.f, 24.f, map);
 
 		return { bigBullet };
 	}

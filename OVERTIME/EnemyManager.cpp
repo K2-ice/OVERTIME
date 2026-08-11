@@ -99,10 +99,9 @@ namespace EngineL
 
 		if (boss->wantsToFire())
 		{
-			std::vector<Bullet*> newBullets = boss->fire();
+			std::vector<Bullet*> newBullets = boss->fire(map);
 
-			for (Bullet* bullet : newBullets)
-			{
+			for (Bullet* bullet : newBullets) {
 				enemyBullets.push_back(bullet);
 				updateManager.add(bullet);
 				renderManager.add(bullet);
@@ -178,14 +177,14 @@ namespace EngineL
 
 	void EnemyManager::checkEnemyBulletCollisions()
 	{
-		for (int b = 0; b < enemyBullets.size(); b++)
-		{
+		for (int b = 0; b < enemyBullets.size(); b++) {
+
 			Bullet* bullet = enemyBullets[b];
 
-			if (CollisionManager::checkCollision(bullet, player))
-			{
-				if (player->canTakeDamage())
-				{
+			if (CollisionManager::checkCollision(bullet, player)) {
+
+				if (player->canTakeDamage()) {
+
 					player->takeDamage(static_cast<int>(bullet->getDamage()));
 					player->resetDamageCooldown();
 				}
@@ -201,20 +200,21 @@ namespace EngineL
 		}
 	}
 
-	void EnemyManager::checkPlayerCollision()
-	{
-		for (Enemy* enemy : enemies)
-		{
-			if (CollisionManager::checkCollision(enemy, player))
-			{
-				if (player->canTakeDamage())
-				{
+	void EnemyManager::checkPlayerCollision() {
+
+		for (Enemy* enemy : enemies) {
+
+			if (CollisionManager::checkCollision(enemy, player)) {
+
+
+				if (player->canTakeDamage()) {
+
 					player->takeDamage(static_cast<int>(enemy->GetStats().damage));
 					player->resetDamageCooldown();
 				}
 
-				if (enemy->explodesOnContact())
-				{
+				if (enemy->explodesOnContact()) {
+
 					enemy->takeDamage(9999);
 				}
 				else
@@ -315,8 +315,8 @@ namespace EngineL
 
 	void EnemyManager::clear()
 	{
-		for (Enemy* enemy : enemies)
-		{
+		for (Enemy* enemy : enemies) {
+
 			updateManager.remove(enemy);
 			renderManager.remove(enemy);
 			delete enemy;
@@ -324,8 +324,8 @@ namespace EngineL
 
 		enemies.clear();
 
-		for (Bullet* bullet : enemyBullets)
-		{
+		for (Bullet* bullet : enemyBullets) {
+
 			updateManager.remove(bullet);
 			renderManager.remove(bullet);
 			delete bullet;

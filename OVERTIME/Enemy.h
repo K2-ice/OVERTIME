@@ -21,7 +21,7 @@ namespace EngineL {
 		void moveTowardPlayer(float deltaTime, float speedMultiplier = 1.f);
 		bool tryMove(float moveX, float moveY);
 		Player* player;
-
+		Map* getMap() const;
 	private:
 
 		float healthBarTimer = 0.f;

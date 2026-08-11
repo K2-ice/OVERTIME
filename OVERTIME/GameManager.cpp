@@ -246,7 +246,7 @@ void GameManager::handleShooting()
 		float dirY = player.getShootDirectionY();
 
 		std::vector<EngineL::Bullet*> newBullets =
-			weaponInventory.getCurrentWeapon()->fire(x, y, dirX, dirY, player.GetStats().damage, player.GetStats().attackSpeed);
+			weaponInventory.getCurrentWeapon()->fire(x, y, dirX, dirY, player.GetStats().damage, player.GetStats().attackSpeed, &map);
 
 		for (EngineL::Bullet* bullet : newBullets)
 		{

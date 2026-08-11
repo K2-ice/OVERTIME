@@ -21,8 +21,8 @@ namespace EngineL
 		infiniteReserve = (reserveAmmo < 0);
 	}
 
-	void Weapon::update(float deltaTime)
-	{
+	void Weapon::update(float deltaTime)	{
+
 		if (cooldown > 0.f) {
 			cooldown -= deltaTime;
 
@@ -56,7 +56,7 @@ namespace EngineL
 		return cooldown <= 0.f && !reloading && currentAmmo > 0;
 	}
 
-	std::vector<Bullet*> Weapon::fire(float x, float y, float dirX, float dirY, float damageBonus, float fireRateBonus) {
+	std::vector<Bullet*> Weapon::fire(float x, float y, float dirX, float dirY, float damageBonus, float fireRateBonus, Map* map) {
 
 		std::vector<Bullet*> bullets;
 
@@ -92,6 +92,7 @@ namespace EngineL
 	}
 
 	void Weapon::startReload(float reloadspeed) {
+
 		if (reloading)
 			return;
 
