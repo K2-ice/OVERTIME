@@ -25,18 +25,17 @@ GameManager::GameManager()
 
 	int layout[EngineL::Map::height][EngineL::Map::width];
 
-	for (int y = 0; y < EngineL::Map::height; y++)
-	{
-		for (int x = 0; x < EngineL::Map::width; x++)
-		{
+	for (int y = 0; y < EngineL::Map::height; y++) {
+
+		for (int x = 0; x < EngineL::Map::width; x++) {
+
 			bool border = (x == 0 || y == 0 || x == EngineL::Map::width - 1 || y == EngineL::Map::height - 1);
 
-			if (border)
-			{
-				layout[y][x] = 42;
+			if (border) {
+				layout[y][x] = EngineL::Map::WallBrick;
 			}
-			else
-			{
+
+			else {
 
 				int variant = (x + y) % 4;
 				layout[y][x] = 1 + variant;
@@ -44,59 +43,104 @@ GameManager::GameManager()
 		}
 	}
 
-	for (int y = 6; y <= 12; y++)
-	{
-		if (y != 9)
-			layout[y][15] = 42;
+	for (int y = 2; y <= 10; y++) {
+
+		if (y != 6)
+			layout[y][13] = EngineL::Map::WallBrick;
 	}
 
-	for (int y = 10; y <= 13; y++)
-	{
-		for (int x = 20; x <= 24; x++)
-		{
-			layout[y][x] = 42;
-		}
+	for (int y = 2; y <= 10; y++) {
+
+		if (y != 5)
+			layout[y][27] = EngineL::Map::WallBrick;
 	}
 
-	for (int x = 25; x <= 35; x++)
-	{
-		layout[16][x] = 42;
-	}
-	for (int x = 25; x <= 35; x++)
-	{
-		layout[18][x] = 42;
+	for (int x = 2; x <= 37; x++) {
+
+		if (x != 10 && x != 24 && x != 33)
+			layout[11][x] = EngineL::Map::WallBrick;
 	}
 
-	layout[3][30] = 42;
-	layout[3][32] = 42;
-	layout[3][34] = 42;
-	layout[20][8] = 42;
-	layout[20][10] = 42;
-	layout[20][12] = 42;
+	for (int y = 12; y <= 22; y++) {
+
+		if (y != 17)
+			layout[y][13] = EngineL::Map::WallBrick;
+	}
+
+	for (int y = 12; y <= 22; y++) {
+		if (y != 18)
+			layout[y][27] = EngineL::Map::WallBrick;
+	}
+
+	layout[9][3] = EngineL::Map::WallCrate;
+	layout[9][5] = EngineL::Map::WallCrate;
+	layout[3][9] = EngineL::Map::WallCrate;
+	layout[8][9] = EngineL::Map::WallCrate;
+
+	// Buissons 
+	layout[3][16] = EngineL::Map::WallBush;
+	layout[3][17] = EngineL::Map::WallBush;
+	layout[4][16] = EngineL::Map::WallBush;
+	layout[7][20] = EngineL::Map::WallBush;
+	layout[7][21] = EngineL::Map::WallBush;
+	layout[8][22] = EngineL::Map::WallBush;
+
+	// Rochers 
+	layout[3][30] = EngineL::Map::WallRock;
+	layout[3][32] = EngineL::Map::WallRock;
+	layout[4][34] = EngineL::Map::WallRock;
+	layout[6][31] = EngineL::Map::WallRock;
+	layout[7][35] = EngineL::Map::WallRock;
+	layout[8][29] = EngineL::Map::WallRock;
+
+	// Buisson
+	layout[14][3] = EngineL::Map::WallBush;
+	layout[14][4] = EngineL::Map::WallBush;
+	layout[15][3] = EngineL::Map::WallBush;
+	layout[18][8] = EngineL::Map::WallBush;
+	layout[18][9] = EngineL::Map::WallBush;
+	layout[20][5] = EngineL::Map::WallBush;
+
+	// Caisses
+	layout[14][16] = EngineL::Map::WallCrate;
+	layout[14][18] = EngineL::Map::WallCrate;
+	layout[16][20] = EngineL::Map::WallCrate;
+	layout[18][22] = EngineL::Map::WallCrate;
+	layout[20][17] = EngineL::Map::WallCrate;
+	layout[14][24] = EngineL::Map::WallCrate;
+
+	// Rochers
+	layout[14][30] = EngineL::Map::WallRock;
+	layout[15][32] = EngineL::Map::WallRock;
+	layout[14][34] = EngineL::Map::WallRock;
+	layout[17][36] = EngineL::Map::WallRock;
+	layout[19][31] = EngineL::Map::WallRock;
+	layout[20][35] = EngineL::Map::WallRock;
+
 
 	map.load(layout, "Assets/Tiles/");
 }
 
-GameManager::~GameManager()
-{
+GameManager::~GameManager() {
+
 	SaveSystem::save(player.getSouls());
 
-	for (auto bullet : bullets)
-	{
+	for (auto bullet : bullets) {
+
 		updateManager.remove(bullet);
 		renderManager.remove(bullet);
 		delete bullet;
 	}
 
-	for (auto soul : souls)
-	{
+	for (auto soul : souls) {
+
 		updateManager.remove(soul);
 		renderManager.remove(soul);
 		delete soul;
 	}
 
-	for (auto pickup : weaponPickups)
-	{
+	for (auto pickup : weaponPickups) {
+
 		updateManager.remove(pickup);
 		renderManager.remove(pickup);
 		delete pickup;
@@ -105,8 +149,8 @@ GameManager::~GameManager()
 	enemyManager.clear();
 }
 
-void GameManager::run()
-{
+void GameManager::run() {
+
 	while (engine.isRunning())
 	{
 		float deltaTime = engine.beginFrame();
@@ -118,27 +162,26 @@ void GameManager::run()
 	}
 }
 
-sf::View GameManager::getGameView()
-{
+sf::View GameManager::getGameView() {
+
 	sf::View view(engine.getWindow().getRenderWindow().getDefaultView());
 	sf::Vector2f playerCenter = player.getPosition() + sf::Vector2f(16.f, 16.f);
 	view.setCenter(playerCenter);
 	return view;
 }
 
-void GameManager::update(float deltaTime)
-{
-	if (sceneManager.getState() != GameState::Playing)
-	{
+void GameManager::update(float deltaTime) {
+
+	if (sceneManager.getState() != GameState::Playing) {
+
 		bool startRun = sceneManager.updateMenus(
 			engine.getInputManager(),
 			engine.getWindow().getRenderWindow(),
 			player, weaponInventory);
 
-		if (startRun)
-		{
-			if (sceneManager.consumeContinueRequested())
-			{
+		if (startRun) {
+
+			if (sceneManager.consumeContinueRequested()) {
 				player.addSouls(savedSouls);
 			}
 
@@ -148,8 +191,8 @@ void GameManager::update(float deltaTime)
 		return;
 	}
 
-	if (engine.getInputManager().isPausePressed())
-	{
+	if (engine.getInputManager().isPausePressed()) {
+
 		sceneManager.setState(GameState::Paused);
 		return;
 	}
@@ -165,8 +208,7 @@ void GameManager::update(float deltaTime)
 
 	runTime += deltaTime;
 
-	if (runTime >= maxRunTime)
-	{
+	if (runTime >= maxRunTime) {
 		updateRecords();
 
 		sceneManager.getSkillTreeScreen().setDuringRun(false);
@@ -194,21 +236,22 @@ void GameManager::update(float deltaTime)
 	collectWeaponPickups();
 	cleanupBullets();
 
-	if (player.GetStats().health <= 0)
-	{
+	if (player.GetStats().health <= 0) {
+
 		updateRecords();
 		sceneManager.setState(GameState::GameOver);
 	}
 }
 
-void GameManager::render()
-{
-	if (sceneManager.getState() == GameState::Playing)
-	{
+void GameManager::render() {
+
+	if (sceneManager.getState() == GameState::Playing) {
+
 		renderGameScene();
 	}
-	else if (sceneManager.getState() == GameState::Paused)
-	{
+
+	else if (sceneManager.getState() == GameState::Paused) {
+
 		renderGameScene();
 		sceneManager.renderCurrentMenu(
 			engine.getWindow().getRenderWindow(),
@@ -216,8 +259,9 @@ void GameManager::render()
 			player,
 			runTime);
 	}
-	else
-	{
+
+	else {
+
 		sceneManager.renderCurrentMenu(
 			engine.getWindow().getRenderWindow(),
 			engine.getInputManager(),
@@ -226,20 +270,20 @@ void GameManager::render()
 	}
 }
 
-void GameManager::handleReload()
-{
-	if (engine.getInputManager().isReloadPressed())
-	{
+void GameManager::handleReload() {
+
+	if (engine.getInputManager().isReloadPressed()) {
+
 		weaponInventory.getCurrentWeapon()->startReload(player.GetStats().reloadSpeed);
 	}
 }
 
-void GameManager::handleShooting()
-{
+void GameManager::handleShooting() {
+
 	EngineL::Weapon* weapon = weaponInventory.getCurrentWeapon();
 
-	if (player.wantsToShoot())
-	{
+	if (player.wantsToShoot()) {
+
 		float x = player.getPosition().x;
 		float y = player.getPosition().y;
 		float dirX = player.getShootDirectionX();
@@ -248,8 +292,8 @@ void GameManager::handleShooting()
 		std::vector<EngineL::Bullet*> newBullets =
 			weaponInventory.getCurrentWeapon()->fire(x, y, dirX, dirY, player.GetStats().damage, player.GetStats().attackSpeed, &map);
 
-		for (EngineL::Bullet* bullet : newBullets)
-		{
+		for (EngineL::Bullet* bullet : newBullets) {
+
 			bullets.push_back(bullet);
 			updateManager.add(bullet);
 			renderManager.add(bullet);
@@ -257,13 +301,13 @@ void GameManager::handleShooting()
 	}
 }
 
-void GameManager::cleanupBullets()
-{
+void GameManager::cleanupBullets() {
+
 	float mapPixelWidth = static_cast<float>(EngineL::Map::width * EngineL::Map::tileSize);
 	float mapPixelHeight = static_cast<float>(EngineL::Map::height * EngineL::Map::tileSize);
 
-	for (int i = 0; i < bullets.size(); i++)
-	{
+	for (int i = 0; i < bullets.size(); i++) {
+
 		EngineL::Bullet* bullet = bullets[i];
 
 		float x = bullet->getPosition().x;
@@ -271,8 +315,8 @@ void GameManager::cleanupBullets()
 
 		bool outOfScreen = x < 0.f || x > mapPixelWidth || y < 0.f || y > mapPixelHeight;
 
-		if (outOfScreen)
-		{
+		if (outOfScreen) {
+
 			updateManager.remove(bullet);
 			renderManager.remove(bullet);
 
@@ -283,14 +327,14 @@ void GameManager::cleanupBullets()
 	}
 }
 
-void GameManager::cleanupEnemies()
-{
+void GameManager::cleanupEnemies() {
+
 	std::vector<sf::Vector2f> deathPositions = enemyManager.removeDeadEnemies();
 
 	killsThisRun += static_cast<int>(deathPositions.size());
 
-	for (const sf::Vector2f& position : deathPositions)
-	{
+	for (const sf::Vector2f& position : deathPositions) {
+
 		EngineL::Soul* soul = new EngineL::Soul(position.x, position.y);
 
 		souls.push_back(soul);
@@ -299,8 +343,8 @@ void GameManager::cleanupEnemies()
 
 		EngineL::WeaponPickup* pickup = weaponInventory.tryDropWeapon(position.x, position.y, player.GetStats().hasShotgun, player.GetStats().hasSubmachinegun);
 
-		if (pickup != nullptr)
-		{
+		if (pickup != nullptr) {
+
 			weaponPickups.push_back(pickup);
 			updateManager.add(pickup);
 			renderManager.add(pickup);
@@ -308,14 +352,14 @@ void GameManager::cleanupEnemies()
 	}
 }
 
-void GameManager::collectSouls()
-{
-	for (int i = 0; i < souls.size(); i++)
-	{
+void GameManager::collectSouls() {
+
+	for (int i = 0; i < souls.size(); i++) {
+
 		EngineL::Soul* soul = souls[i];
 
-		if (EngineL::CollisionManager::checkCollision(&player, soul))
-		{
+		if (EngineL::CollisionManager::checkCollision(&player, soul)) {
+
 			int amount = soul->getValue() * player.GetStats().difficulty;
 
 			player.addSouls(amount);
@@ -332,18 +376,18 @@ void GameManager::collectSouls()
 	}
 }
 
-void GameManager::collectWeaponPickups()
-{
-	for (int i = 0; i < weaponPickups.size(); i++)
-	{
+void GameManager::collectWeaponPickups() {
+
+	for (int i = 0; i < weaponPickups.size(); i++) {
+
 		EngineL::WeaponPickup* pickup = weaponPickups[i];
 
-		if (EngineL::CollisionManager::checkCollision(&player, pickup))
-		{
+		if (EngineL::CollisionManager::checkCollision(&player, pickup)) {
+
 			EngineL::Weapon* weapon = weaponInventory.getWeaponById(pickup->getWeaponId());
 
-			if (weapon != nullptr && !weaponInventory.isInInventory(weapon))
-			{
+			if (weapon != nullptr && !weaponInventory.isInInventory(weapon)) {
+
 				weaponInventory.equipPickup(weapon);
 			}
 
@@ -358,8 +402,8 @@ void GameManager::collectWeaponPickups()
 	}
 }
 
-void GameManager::updateRecords()
-{
+void GameManager::updateRecords() {
+
 	if (runTime > bestTime)
 		bestTime = runTime;
 
@@ -370,8 +414,8 @@ void GameManager::updateRecords()
 		bestSouls = soulsThisRun;
 }
 
-void GameManager::startNewRun()
-{
+void GameManager::startNewRun() {
+
 
 	showSkillTree = false;
 	maxRunTime = player.getMaxTime();
@@ -390,35 +434,37 @@ void GameManager::startNewRun()
 	weaponInventory.reloadAll();
 	weaponInventory.reset(player.hasSecondWeaponSlot());
 
-	for (auto bullet : bullets)
-	{
+	for (auto bullet : bullets) {
 		updateManager.remove(bullet);
 		renderManager.remove(bullet);
 		delete bullet;
 	}
+
 	bullets.clear();
 
-	for (auto soul : souls)
-	{
+	for (auto soul : souls) {
+
 		updateManager.remove(soul);
 		renderManager.remove(soul);
 		delete soul;
 	}
+
 	souls.clear();
 
-	for (auto pickup : weaponPickups)
-	{
+	for (auto pickup : weaponPickups) {
+
 		updateManager.remove(pickup);
 		renderManager.remove(pickup);
 		delete pickup;
 	}
+
 	weaponPickups.clear();
 
 	enemyManager.clear();
 }
 
-void GameManager::renderGameScene()
-{
+void GameManager::renderGameScene() {
+
 	sf::RenderWindow& window = engine.getWindow().getRenderWindow();
 
 	sf::View gameView = getGameView();

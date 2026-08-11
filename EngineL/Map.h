@@ -16,6 +16,11 @@ namespace EngineL {
 		static const int height = 24;
 		static const int tileSize = 64;
 
+		static const int WallBrick = 42;
+		static const int WallCrate = 130;
+		static const int WallBush = 183;
+		static const int WallRock = 185;
+
 		Map();
 
 		bool load(const int layout[height][width], const std::string& tileFolder);

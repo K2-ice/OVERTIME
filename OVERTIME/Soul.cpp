@@ -7,6 +7,7 @@ namespace EngineL
 		: Entity(x, y, 16.f, 16.f, sf::Color::Cyan)
 	{
 		this->value = value;
+		setTexture("Assets/PNG (Transparent)/flare_01.png");
 	}
 
 	void Soul::update(float deltaTime)

@@ -5,14 +5,11 @@
 
 namespace EngineL
 {
-	Map::Map()
-	{
-	}
+	Map::Map()	{	}
 
-	bool Map::isWallTileId(int tileId) const
-	{
+	bool Map::isWallTileId(int tileId) const	{
 
-		return tileId == 42 || tileId == 13;
+		return tileId == WallBrick || tileId == WallCrate || tileId == WallBush	|| tileId == WallRock;
 	}
 
 	bool Map::load(const int layout[height][width], const std::string& tileFolder)
@@ -20,10 +17,10 @@ namespace EngineL
 		textures.clear();
 		sprites.clear();
 
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
+		for (int y = 0; y < height; y++)		{
+
+			for (int x = 0; x < width; x++)			{
+
 				tiles[y][x] = layout[y][x];
 
 				int tileId = layout[y][x];

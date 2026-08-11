@@ -10,35 +10,30 @@ namespace EngineL
 		: updateManager(updateManager)
 		, renderManager(renderManager)
 		, player(player),
-		map(map)
-	{
+		map(map) {
 	}
 
-	std::vector<Enemy*>& EnemyManager::getEnemies()
-	{
+	std::vector<Enemy*>& EnemyManager::getEnemies() {
 		return enemies;
 	}
 
-	void EnemyManager::update(float deltaTime, float runTime)
-	{
+	void EnemyManager::update(float deltaTime, float runTime) {
 		spawnTimer += deltaTime;
 
-		if (spawnTimer >= spawnDelay)
-		{
+		if (spawnTimer >= spawnDelay) {
 			spawnTimer = 0.f;
 			spawnEnemy();
 		}
 
-		if (!bossSpawned && runTime >= bossSpawnTime)
-		{
+		if (!bossSpawned && runTime >= bossSpawnTime) {
 			spawnBoss();
 		}
 
 		updateBossAttacks();
 	}
 
-	void EnemyManager::spawnEnemy()
-	{
+	void EnemyManager::spawnEnemy() {
+
 		sf::Vector2f playerPosition = player->getPosition();
 
 		float angle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 6.2831853f;
@@ -50,20 +45,21 @@ namespace EngineL
 
 		Enemy* enemy = nullptr;
 
-		if (roll < 45)
-		{
+		if (roll < 45) {
+
 			enemy = new Enemy(x, y, player, player->GetStats().difficulty, map);
 		}
-		else if (roll < 65)
-		{
+
+		else if (roll < 65) {
 			enemy = new KamikazeEnemy(x, y, player, player->GetStats().difficulty, map);
 		}
-		else if (roll < 85)
-		{
+
+		else if (roll < 85) {
 			enemy = new MeleeEnemy(x, y, player, player->GetStats().difficulty, map);
 		}
-		else
-		{
+
+		else {
+
 			enemy = new BelierEnemy(x, y, player, player->GetStats().difficulty, map);
 		}
 
@@ -73,8 +69,8 @@ namespace EngineL
 		renderManager.add(enemy);
 	}
 
-	void EnemyManager::spawnBoss()
-	{
+	void EnemyManager::spawnBoss() {
+
 		bossSpawned = true;
 
 		sf::Vector2f playerPosition = player->getPosition();
@@ -92,13 +88,13 @@ namespace EngineL
 		renderManager.add(boss);
 	}
 
-	void EnemyManager::updateBossAttacks()
-	{
+	void EnemyManager::updateBossAttacks() {
+
 		if (boss == nullptr || !boss->isAlive())
 			return;
 
-		if (boss->wantsToFire())
-		{
+		if (boss->wantsToFire()) {
+
 			std::vector<Bullet*> newBullets = boss->fire(map);
 
 			for (Bullet* bullet : newBullets) {
@@ -109,23 +105,23 @@ namespace EngineL
 		}
 	}
 
-	void EnemyManager::checkBulletCollisions(std::vector<Bullet*>& bullets)
-	{
-		for (int b = 0; b < static_cast<int>(bullets.size()); b++)
-		{
+	void EnemyManager::checkBulletCollisions(std::vector<Bullet*>& bullets) {
+
+		for (int b = 0; b < static_cast<int>(bullets.size()); b++) {
+
 			Bullet* bullet = bullets[b];
 
 			bool bulletDestroyed = false;
 
-			for (int e = 0; e < static_cast<int>(enemies.size()); e++)
-			{
+			for (int e = 0; e < static_cast<int>(enemies.size()); e++) {
+
 				Enemy* enemy = enemies[e];
 
 				if (!enemy->isAlive())
 					continue;
 
-				if (CollisionManager::checkCollision(bullet, enemy))
-				{
+				if (CollisionManager::checkCollision(bullet, enemy)) {
+
 					float damage = bullet->getDamage();
 
 					float rollCrit =
@@ -175,11 +171,13 @@ namespace EngineL
 		}
 	}
 
-	void EnemyManager::checkEnemyBulletCollisions()
-	{
+	void EnemyManager::checkEnemyBulletCollisions()	{
+
 		for (int b = 0; b < enemyBullets.size(); b++) {
 
 			Bullet* bullet = enemyBullets[b];
+
+			bool remove = false;
 
 			if (CollisionManager::checkCollision(bullet, player)) {
 
@@ -188,6 +186,15 @@ namespace EngineL
 					player->takeDamage(static_cast<int>(bullet->getDamage()));
 					player->resetDamageCooldown();
 				}
+
+				remove = true;
+			}
+			else if (bullet->hasHitWall()) {
+
+				remove = true;
+			}
+
+			if (remove) {
 
 				updateManager.remove(bullet);
 				renderManager.remove(bullet);
@@ -199,6 +206,7 @@ namespace EngineL
 			}
 		}
 	}
+	
 
 	void EnemyManager::checkPlayerCollision() {
 
@@ -217,8 +225,9 @@ namespace EngineL
 
 					enemy->takeDamage(9999);
 				}
-				else
-				{
+
+				else {
+
 					pushEnemyAwayFromPlayer(enemy);
 				}
 			}
