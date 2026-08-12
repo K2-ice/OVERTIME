@@ -280,32 +280,34 @@ void GameManager::switchToLevel2() {
 	player.setPosition(spawnPosition.x, spawnPosition.y);
 }
 
-void GameManager::updateMusic() {
-
+void GameManager::updateMusic()
+{
 	std::string desiredTrack;
 
-	if (sceneManager.getState() == GameState::MainMenu) {
+	if (sceneManager.getState() == GameState::MainMenu)	{
 		desiredTrack = "Assets/Music/1-01__Deep_in_the_Forest.mp3";
 	}
-	else if (sceneManager.getState() == GameState::Settings) {
+
+	else if (sceneManager.getState() == GameState::Settings)	{
 		desiredTrack = "Assets/Music/1-02__Home_Sweet_Home.mp3";
 	}
-	else {
+
+	else
+	{
 		desiredTrack = "Assets/Music/1-35__Till_We_Meet_Again.mp3";
 	}
 
-	if (desiredTrack != currentMusicPath) {
+	if (desiredTrack != currentMusicPath)	{
+		if (music.openFromFile(desiredTrack))		{
+			currentMusicPath = desiredTrack;
 
-		currentMusicPath = desiredTrack;
-
-		bool loaded = music.openFromFile(desiredTrack);
-
-		if (loaded) {
 			music.setLooping(true);
 			music.play();
 		}
-		else {
-			std::cout << "Impossible de charger la musique : " << desiredTrack << std::endl;
+
+		else		{
+			std::cout << "Impossible de charger la musique : "
+				<< desiredTrack << std::endl;
 		}
 	}
 }
