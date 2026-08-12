@@ -3,7 +3,7 @@
 
 namespace EngineL
 {
-	Soul::Soul(float x, float y, int value) : Entity(x, y, 300.f, 300.f, sf::Color::Cyan) {
+	Soul::Soul(float x, float y, int value) : Entity(x, y, 32.f, 32.f, sf::Color::Cyan) {
 
 		this->value = value;
 

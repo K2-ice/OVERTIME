@@ -17,6 +17,7 @@
 #include "Map.h"
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/View.hpp>
+#include <SFML/Audio/Music.hpp>
 
 class GameManager {
 public:
@@ -38,7 +39,12 @@ private:
 	void collectSouls();
 	void collectWeaponPickups();
 	void updateRecords();
+	void updateMusic();
+	void buildLevel1Layout(int layout[EngineL::Map::height][EngineL::Map::width]);
+	void buildLevel2Layout(int layout[EngineL::Map::height][EngineL::Map::width]);
+	void switchToLevel2();
 	sf::View getGameView();
+	sf::Vector2f getRandomPlayerSpawnPosition();
 
 	EngineL::GameEngine engine;
 	EngineL::Map map;
@@ -61,13 +67,19 @@ private:
 	float runTime = 0.f;
 	float maxRunTime = player.getMaxTime();
 
+	bool isLevel2 = false;
+	float level2Time = 60.f;
+
+	float levelUpMessageTimer = 0.f;
+	float levelUpMessageDuration = 3.f;
+
 	int savedSouls = 0;
 
-	
+
 	int killsThisRun = 0;
 	int soulsThisRun = 0;
 
-	
+
 	float bestTime = 0.f;
 	int bestKills = 0;
 	int bestSouls = 0;
@@ -75,4 +87,7 @@ private:
 	sf::Font font;
 	HUD hud;
 	SceneManager sceneManager;
+
+	sf::Music music;
+	std::string currentMusicPath;
 };

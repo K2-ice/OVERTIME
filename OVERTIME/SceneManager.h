@@ -35,6 +35,7 @@ public:
 	MainMenuScreen& getMainMenuScreen();
 
 	bool consumeContinueRequested();
+	bool consumeQuitRequested();
 
 private:
 
@@ -47,4 +48,5 @@ private:
 	GameOverScreen gameOverScreen;
 
 	bool continueRequested = false;
+	bool quitRequested = false;
 };

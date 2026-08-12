@@ -22,7 +22,7 @@ namespace EngineL {
 		EnemyManager(UpdateManager& updateManager, RenderManager& renderManager, Player* player, Map* map);
 		std::vector<Enemy*>& getEnemies();
 
-		void update(float deltaTime, float runTime);
+		void update(float deltaTime, float runTime, bool isLevel2);
 		void checkBulletCollisions(std::vector<Bullet*>& bullets);
 		void checkPlayerCollision();
 		void checkEnemyBulletCollisions();
@@ -50,6 +50,8 @@ namespace EngineL {
 		float spawnDelay = 1.f;
 		float bossSpawnTime = 10.f;
 		bool bossSpawned = false;
+
+		bool currentIsLevel2 = false;
 
 		Boss* boss = nullptr;
 	};

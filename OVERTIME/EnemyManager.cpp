@@ -4,8 +4,8 @@
 #include <cmath>
 #include <cstdlib>
 
-namespace EngineL
-{
+namespace EngineL {
+
 	EnemyManager::EnemyManager(UpdateManager& updateManager, RenderManager& renderManager, Player* player, Map* map)
 		: updateManager(updateManager)
 		, renderManager(renderManager)
@@ -17,10 +17,15 @@ namespace EngineL
 		return enemies;
 	}
 
-	void EnemyManager::update(float deltaTime, float runTime) {
+	void EnemyManager::update(float deltaTime, float runTime, bool isLevel2) {
+
+		currentIsLevel2 = isLevel2;
+
 		spawnTimer += deltaTime;
 
-		if (spawnTimer >= spawnDelay) {
+		float currentSpawnDelay = currentIsLevel2 ? 0.7f : spawnDelay;
+
+		if (spawnTimer >= currentSpawnDelay) {
 			spawnTimer = 0.f;
 			spawnEnemy();
 		}
@@ -34,33 +39,47 @@ namespace EngineL
 
 	void EnemyManager::spawnEnemy() {
 
-		sf::Vector2f playerPosition = player->getPosition();
+		sf::Vector2f spawnPosition = getRandomSpawnPosition();
 
-		float angle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 6.2831853f;
-
-		float x = playerPosition.x + std::cos(angle) * 500.f;
-		float y = playerPosition.y + std::sin(angle) * 500.f;
+		float x = spawnPosition.x;
+		float y = spawnPosition.y;
 
 		int roll = rand() % 100;
 
 		Enemy* enemy = nullptr;
 
-		if (roll < 45) {
+		if (!currentIsLevel2) {
 
-			enemy = new Enemy(x, y, player, player->GetStats().difficulty, map);
-		}
 
-		else if (roll < 65) {
-			enemy = new KamikazeEnemy(x, y, player, player->GetStats().difficulty, map);
-		}
-
-		else if (roll < 85) {
-			enemy = new MeleeEnemy(x, y, player, player->GetStats().difficulty, map);
+			if (roll < 45) {
+				enemy = new Enemy(x, y, player, player->GetStats().difficulty, map);
+			}
+			else if (roll < 65) {
+				enemy = new KamikazeEnemy(x, y, player, player->GetStats().difficulty, map);
+			}
+			else if (roll < 85) {
+				enemy = new MeleeEnemy(x, y, player, player->GetStats().difficulty, map);
+			}
+			else {
+				enemy = new BelierEnemy(x, y, player, player->GetStats().difficulty, map);
+			}
 		}
 
 		else {
 
-			enemy = new BelierEnemy(x, y, player, player->GetStats().difficulty, map);
+
+			if (roll < 15) {
+				enemy = new Enemy(x, y, player, player->GetStats().difficulty, map);
+			}
+			else if (roll < 50) {
+				enemy = new KamikazeEnemy(x, y, player, player->GetStats().difficulty, map);
+			}
+			else if (roll < 65) {
+				enemy = new MeleeEnemy(x, y, player, player->GetStats().difficulty, map);
+			}
+			else {
+				enemy = new BelierEnemy(x, y, player, player->GetStats().difficulty, map);
+			}
 		}
 
 		enemies.push_back(enemy);
@@ -73,14 +92,9 @@ namespace EngineL
 
 		bossSpawned = true;
 
-		sf::Vector2f playerPosition = player->getPosition();
+		sf::Vector2f spawnPosition = getRandomSpawnPosition();
 
-		float angle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 6.2831853f;
-
-		float x = playerPosition.x + std::cos(angle) * 500.f;
-		float y = playerPosition.y + std::sin(angle) * 500.f;
-
-		boss = new Boss(x, y, player, player->GetStats().difficulty, map);
+		boss = new Boss(spawnPosition.x, spawnPosition.y, player, player->GetStats().difficulty, map);
 
 		enemies.push_back(boss);
 
@@ -171,7 +185,7 @@ namespace EngineL
 		}
 	}
 
-	void EnemyManager::checkEnemyBulletCollisions()	{
+	void EnemyManager::checkEnemyBulletCollisions() {
 
 		for (int b = 0; b < enemyBullets.size(); b++) {
 
@@ -206,7 +220,7 @@ namespace EngineL
 			}
 		}
 	}
-	
+
 
 	void EnemyManager::checkPlayerCollision() {
 
@@ -234,8 +248,7 @@ namespace EngineL
 		}
 	}
 
-	void EnemyManager::pushEnemyAwayFromPlayer(Enemy* enemy)
-	{
+	void EnemyManager::pushEnemyAwayFromPlayer(Enemy* enemy) {
 		sf::Vector2f enemyPos = enemy->getPosition();
 		sf::Vector2f playerPos = player->getPosition();
 
@@ -244,8 +257,7 @@ namespace EngineL
 
 		float length = std::sqrt(dx * dx + dy * dy);
 
-		if (length == 0.f)
-		{
+		if (length == 0.f) {
 			dx = 1.f;
 			dy = 0.f;
 			length = 1.f;
@@ -264,46 +276,23 @@ namespace EngineL
 		float mapPixelWidth = static_cast<float>(Map::width * Map::tileSize);
 		float mapPixelHeight = static_cast<float>(Map::height * Map::tileSize);
 
-		sf::Vector2f playerPosition = player->getPosition();
+		float x = static_cast<float>(rand() % static_cast<int>(mapPixelWidth - 32.f));
+		float y = static_cast<float>(rand() % static_cast<int>(mapPixelHeight - 32.f));
 
-
-		float offsetX = static_cast<float>(rand() % 1000 - 500);
-		float offsetY = static_cast<float>(rand() % 1000 - 500);
-
-		float x = playerPosition.x + offsetX;
-		float y = playerPosition.y + offsetY;
-
-		if (x < 0.f)
-			x = 0.f;
-
-		if (x > mapPixelWidth - 32.f)
-			x = mapPixelWidth - 32.f;
-
-		if (y < 0.f)
-			y = 0.f;
-
-		if (y > mapPixelHeight - 32.f)
-			y = mapPixelHeight - 32.f;
-
-
-		if (map != nullptr && map->isWallArea(x, y, 32.f, 32.f))
-		{
-			return playerPosition;
+		if (map != nullptr && map->isWallArea(x, y, 32.f, 32.f)) {
+			return player->getPosition();
 		}
 
 		return sf::Vector2f(x, y);
 	}
 
-	std::vector<sf::Vector2f> EnemyManager::removeDeadEnemies()
-	{
+	std::vector<sf::Vector2f> EnemyManager::removeDeadEnemies() {
 		std::vector<sf::Vector2f> deathPositions;
 
-		for (int i = 0; i < enemies.size(); i++)
-		{
+		for (int i = 0; i < enemies.size(); i++) {
 			Enemy* enemy = enemies[i];
 
-			if (!enemy->isAlive())
-			{
+			if (!enemy->isAlive()) {
 				deathPositions.push_back(enemy->getPosition());
 
 				if (enemy == boss)
@@ -322,8 +311,7 @@ namespace EngineL
 		return deathPositions;
 	}
 
-	void EnemyManager::clear()
-	{
+	void EnemyManager::clear() {
 		for (Enemy* enemy : enemies) {
 
 			updateManager.remove(enemy);

@@ -1,30 +1,31 @@
 #include "pch.h"
 #include "MainMenuScreen.h"
 
-namespace
-{
+namespace {
+
 	const sf::FloatRect kContinueButtonBounds({ 490.f, 260.f }, { 300.f, 70.f });
 	const sf::FloatRect kPlayButtonBounds({ 490.f, 350.f }, { 300.f, 70.f });
 	const sf::FloatRect kSettingsButtonBounds({ 490.f, 440.f }, { 300.f, 70.f });
 	const sf::FloatRect kQuitButtonBounds({ 490.f, 530.f }, { 300.f, 70.f });
 }
 
-MainMenuScreen::MainMenuScreen(sf::Font& font): font(font)
-{
+MainMenuScreen::MainMenuScreen(sf::Font& font) : font(font) {
+
+	continueIcon.loadFromFile("Assets/Icons/Game Icons Expansion/PNG/White/1x/diamond.png");
+	playIcon.loadFromFile("Assets/Icons/Game Icons Expansion/PNG/White/1x/flag.png");
+	settingsIcon.loadFromFile("Assets/Icons/Game Icons/PNG/White/1x/gear.png");
+	quitIcon.loadFromFile("Assets/Icons/Game Icons/PNG/White/1x/exitLeft.png");
 }
 
-void MainMenuScreen::setSavedSouls(int souls)
-{
+void MainMenuScreen::setSavedSouls(int souls) {
 	savedSouls = souls;
 }
 
-MainMenuAction MainMenuScreen::handleInput(EngineL::InputManager& input, const sf::RenderWindow& window)
-{
+MainMenuAction MainMenuScreen::handleInput(EngineL::InputManager& input, const sf::RenderWindow& window) {
 	bool pressed = input.isMouseButtonPressed(sf::Mouse::Button::Left);
 	MainMenuAction action = MainMenuAction::None;
 
-	if (pressed && !mouseHeld)
-	{
+	if (pressed && !mouseHeld) {
 		mouseHeld = true;
 
 		sf::Vector2i mousePixel = input.getMousePosition(window);
@@ -68,16 +69,15 @@ void MainMenuScreen::render(sf::RenderWindow& window) {
 			? "Continuer (" + std::to_string(savedSouls) + " Ames)"
 			: "Continue (" + std::to_string(savedSouls) + " Souls)";
 
-		drawButton(window, kContinueButtonBounds, label);
+		drawButton(window, kContinueButtonBounds, label, continueIcon);
 	}
 
-	drawButton(window, kPlayButtonBounds, isFrench ? "Nouvelle partie" : "New game");
-	drawButton(window, kSettingsButtonBounds, isFrench ? "Parametres" : "Settings");
-	drawButton(window, kQuitButtonBounds, isFrench ? "Quitter" : "Quit");
+	drawButton(window, kPlayButtonBounds, isFrench ? "Nouvelle partie" : "New game", playIcon);
+	drawButton(window, kSettingsButtonBounds, isFrench ? "Parametres" : "Settings", settingsIcon);
+	drawButton(window, kQuitButtonBounds, isFrench ? "Quitter" : "Quit", quitIcon);
 }
 
-void MainMenuScreen::drawButton(sf::RenderWindow& window, const sf::FloatRect& bounds, const std::string& label)
-{
+void MainMenuScreen::drawButton(sf::RenderWindow& window, const sf::FloatRect& bounds, const std::string& label, const sf::Texture& icon) {
 	sf::RectangleShape box;
 	box.setPosition(bounds.position);
 	box.setSize(bounds.size);
@@ -92,9 +92,29 @@ void MainMenuScreen::drawButton(sf::RenderWindow& window, const sf::FloatRect& b
 	text.setString(label);
 
 	sf::FloatRect textBounds = text.getLocalBounds();
-	text.setPosition({
-		bounds.position.x + bounds.size.x / 2.f - textBounds.size.x / 2.f,
-		bounds.position.y + bounds.size.y / 2.f - textBounds.size.y / 2.f - 5.f
-		});
+
+	float iconSize = 28.f;
+	float spacing = 10.f;
+
+	float contentWidth = iconSize + spacing + textBounds.size.x;
+
+	float startX = bounds.position.x + bounds.size.x / 2.f - contentWidth / 2.f;
+	float centerY = bounds.position.y + bounds.size.y / 2.f;
+
+	sf::Vector2u textureSize = icon.getSize();
+
+	if (textureSize.x > 0 && textureSize.y > 0) {
+		sf::Sprite iconSprite(icon);
+
+		iconSprite.setScale(sf::Vector2f(
+			iconSize / static_cast<float>(textureSize.x),
+			iconSize / static_cast<float>(textureSize.y)));
+
+		iconSprite.setPosition({ startX, centerY - iconSize / 2.f });
+
+		window.draw(iconSprite);
+	}
+
+	text.setPosition({ startX + iconSize + spacing,	centerY - textBounds.size.y / 2.f - 5.f });
 	window.draw(text);
 }
