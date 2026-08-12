@@ -296,7 +296,6 @@ void GameManager::updateMusic() {
 
 	if (desiredTrack != currentMusicPath) {
 
-	
 		currentMusicPath = desiredTrack;
 
 		bool loaded = music.openFromFile(desiredTrack);
@@ -391,6 +390,8 @@ void GameManager::update(float deltaTime) {
 	collectSouls();
 	collectWeaponPickups();
 	cleanupBullets();
+
+	objectiveManager.update(runTime, killsThisRun, soulsThisRun);
 
 	if (player.GetStats().health <= 0) {
 
@@ -582,6 +583,8 @@ void GameManager::startNewRun() {
 	isLevel2 = false;
 	levelUpMessageTimer = 0.f;
 
+	objectiveManager.reset();
+
 	int layout[EngineL::Map::height][EngineL::Map::width];
 	buildLevel1Layout(layout);
 	map.load(layout, "Assets/Tiles/");
@@ -649,6 +652,8 @@ void GameManager::renderGameScene() {
 		bestTime,
 		bestKills,
 		bestSouls);
+
+	hud.drawObjectives(window, objectiveManager.getObjectives());
 
 	if (levelUpMessageTimer > 0.f) {
 

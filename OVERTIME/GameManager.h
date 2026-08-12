@@ -13,6 +13,7 @@
 #include "RenderManager.h"
 #include "SceneManager.h"
 #include "HUD.h"
+#include "ObjectiveManager.h"
 #include "SaveSystem.h"
 #include "Map.h"
 #include <SFML/Graphics/Font.hpp>
@@ -58,6 +59,7 @@ private:
 	std::vector<EngineL::WeaponPickup*> weaponPickups;
 
 	WeaponInventory weaponInventory;
+	ObjectiveManager objectiveManager;
 
 	float spawnTimer = 0.f;
 	float spawnDelay = 1.f;

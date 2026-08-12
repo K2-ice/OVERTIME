@@ -4,7 +4,6 @@
 #include <iomanip>
 
 std::string translateWeaponName(const std::string& name, bool isFrench) {
-
 	if (isFrench)
 		return name;
 	if (name == "Pistolet")
@@ -16,7 +15,8 @@ std::string translateWeaponName(const std::string& name, bool isFrench) {
 	return name;
 }
 
-HUD::HUD(sf::Font& font) : font(font)
+HUD::HUD(sf::Font& font)
+	: font(font)
 {
 	hourglassIcon.loadFromFile("Assets/Icons/Board Game Icons/PNG/Default (64px)/hourglass.png");
 	heartIcon.loadFromFile("Assets/Icons/Board Game Icons/PNG/Default (64px)/suit_hearts.png");
@@ -40,7 +40,8 @@ std::string HUD::formatTime(float seconds) const
 	return stream.str();
 }
 
-void HUD::drawIcon(sf::RenderWindow& window, const sf::Texture& texture, float x, float y, float size) {
+void HUD::drawIcon(sf::RenderWindow& window, const sf::Texture& texture, float x, float y, float size)
+{
 	sf::Vector2u textureSize = texture.getSize();
 
 	if (textureSize.x == 0 || textureSize.y == 0)
@@ -57,7 +58,8 @@ void HUD::drawIcon(sf::RenderWindow& window, const sf::Texture& texture, float x
 	window.draw(icon);
 }
 
-const sf::Texture& HUD::getWeaponIcon(const std::string& weaponName) const {
+const sf::Texture& HUD::getWeaponIcon(const std::string& weaponName) const
+{
 	if (weaponName == "Mitraillette")
 		return smgIcon;
 
@@ -67,17 +69,22 @@ const sf::Texture& HUD::getWeaponIcon(const std::string& weaponName) const {
 	return pistolIcon;
 }
 
-void HUD::draw(sf::RenderWindow& window, EngineL::Player& player, EngineL::Weapon* weapon,
+void HUD::draw(
+	sf::RenderWindow& window,
+	EngineL::Player& player,
+	EngineL::Weapon* weapon,
 	float runTime,
 	float maxRunTime,
 	bool hasSecondWeaponSlot,
 	float bestTime,
 	int bestKills,
-	int bestSouls) {
+	int bestSouls)
+{
 	bool isFrench = Language::current == LanguageOption::French;
 
 	sf::Text text(font);
 
+	// Chrono
 	text.setCharacterSize(30);
 	text.setFillColor(sf::Color::White);
 	text.setString(formatTime(runTime) + " / " + formatTime(maxRunTime));
@@ -91,6 +98,7 @@ void HUD::draw(sf::RenderWindow& window, EngineL::Player& player, EngineL::Weapo
 	text.setPosition({ chronoX, chronoY });
 	window.draw(text);
 
+	// Vie
 	drawIcon(window, heartIcon, 10.f, 18.f, 26.f);
 
 	text.setCharacterSize(30);
@@ -100,7 +108,6 @@ void HUD::draw(sf::RenderWindow& window, EngineL::Player& player, EngineL::Weapo
 		std::to_string(static_cast<int>(player.GetStats().health)) +
 		" / " +
 		std::to_string(static_cast<int>(player.GetStats().maxHealth)));
-
 	text.setPosition({ 42.f, 20.f });
 	window.draw(text);
 
@@ -131,7 +138,7 @@ void HUD::draw(sf::RenderWindow& window, EngineL::Player& player, EngineL::Weapo
 	text.setPosition({ 42.f, 62.f });
 	window.draw(text);
 
-
+	// Record
 	std::string recordLabel = isFrench ? "Record : " : "Record: ";
 	std::string killsLabel = isFrench ? " kills, " : " kills, ";
 	std::string soulsLabel = isFrench ? " souls" : " souls";
@@ -158,4 +165,29 @@ void HUD::draw(sf::RenderWindow& window, EngineL::Player& player, EngineL::Weapo
 
 	text.setPosition({ recordX, recordY });
 	window.draw(text);
+}
+
+void HUD::drawObjectives(sf::RenderWindow& window, const std::vector<Objective>& objectives)
+{
+	float x = 10.f;
+	float y = 110.f;
+
+	for (int i = 0; i < objectives.size(); i++)
+	{
+		const Objective& objective = objectives[i];
+
+		if (objective.completed)
+		{
+			drawIcon(window, starIcon, x, y, 18.f);
+		}
+
+		sf::Text text(font);
+		text.setCharacterSize(16);
+		text.setFillColor(objective.completed ? sf::Color::Yellow : sf::Color(200, 200, 200));
+		text.setString(objective.description);
+		text.setPosition({ x + 24.f, y });
+		window.draw(text);
+
+		y += 22.f;
+	}
 }

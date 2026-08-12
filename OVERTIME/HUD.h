@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -7,6 +8,7 @@
 #include "Player.h"
 #include "Weapon.h"
 #include "Language.h"
+#include "Objective.h"
 
 class HUD {
 public:
@@ -23,8 +25,9 @@ public:
 		int bestKills,
 		int bestSouls);
 
-private:
+	void drawObjectives(sf::RenderWindow& window, const std::vector<Objective>& objectives);
 
+private:
 	std::string formatTime(float seconds) const;
 	void drawIcon(sf::RenderWindow& window, const sf::Texture& texture, float x, float y, float size);
 	const sf::Texture& getWeaponIcon(const std::string& weaponName) const;

@@ -180,6 +180,8 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMenuScreen.cpp" />
     <ClCompile Include="MeleeEnemy.cpp" />
+    <ClCompile Include="Objective.cpp" />
+    <ClCompile Include="ObjectiveManager.cpp" />
     <ClCompile Include="PauseScreen.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SaveSystem.cpp" />
@@ -208,6 +210,8 @@
     <ClInclude Include="Language.h" />
     <ClInclude Include="MainMenuScreen.h" />
     <ClInclude Include="MeleeEnemy.h" />
+    <ClInclude Include="Objective.h" />
+    <ClInclude Include="ObjectiveManager.h" />
     <ClInclude Include="PauseScreen.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SaveSystem.h" />
