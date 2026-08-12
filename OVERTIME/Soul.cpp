@@ -4,7 +4,7 @@
 namespace EngineL
 {
 	Soul::Soul(float x, float y, int value)
-		: Entity(x, y, 16.f, 16.f, sf::Color::Cyan)
+		: Entity(x, y, 300.f, 300.f, sf::Color::Cyan)
 	{
 		this->value = value;
 		setTexture("Assets/PNG (Transparent)/flare_01.png");
