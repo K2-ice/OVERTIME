@@ -1,7 +1,5 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <vector>
-#include <memory>
 #include <string>
 #include "Renderer.h"
 #include "pch.h"
@@ -32,8 +30,19 @@ namespace EngineL {
 
 		bool isWallTileId(int tileId) const;
 
-		std::vector<std::unique_ptr<sf::Texture>> textures;
-		std::vector<sf::Sprite> sprites;
+		
+		void drawTile(Renderer& renderer, const sf::Texture& texture, int x, int y);
+
+		const sf::Texture& getGrassTexture(int x, int y) const;
+
+		const sf::Texture* getWallTexture(int tileId) const;
+
+		sf::Texture grassTextures[4];
+		sf::Texture brickTexture;
+		sf::Texture crateTexture;
+		sf::Texture bushTexture;
+		sf::Texture rockTexture;
+
 		int tiles[height][width] = {};
 	};
 }

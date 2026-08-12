@@ -3,29 +3,24 @@
 
 namespace EngineL
 {
-	Soul::Soul(float x, float y, int value)
-		: Entity(x, y, 300.f, 300.f, sf::Color::Cyan)
-	{
+	Soul::Soul(float x, float y, int value) : Entity(x, y, 300.f, 300.f, sf::Color::Cyan) {
+
 		this->value = value;
+
 		setTexture("Assets/PNG (Transparent)/flare_01.png");
 	}
 
-	void Soul::update(float deltaTime)
-	{
-	}
+	void Soul::update(float deltaTime) {}
 
-	bool Soul::isCollected() const
-	{
+	bool Soul::isCollected() const {
 		return collected;
 	}
 
-	void Soul::collect()
-	{
+	void Soul::collect() {
 		collected = true;
 	}
 
-	int Soul::getValue() const
-	{
+	int Soul::getValue() const {
 		return value;
 	}
 }

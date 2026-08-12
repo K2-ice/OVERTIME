@@ -315,7 +315,7 @@ void GameManager::cleanupBullets() {
 
 		bool outOfScreen = x < 0.f || x > mapPixelWidth || y < 0.f || y > mapPixelHeight;
 
-		if (outOfScreen) {
+		if (outOfScreen || bullet->hasHitWall()) {
 
 			updateManager.remove(bullet);
 			renderManager.remove(bullet);

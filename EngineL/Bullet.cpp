@@ -3,27 +3,31 @@
 
 namespace EngineL {
 
-	Bullet::Bullet(float x, float y, float directionX, float directionY, float damage, sf::Color color, float width, float height, Map* map)
-		: Entity(x, y, width, height, color) {
+	Bullet::Bullet(float x, float y, float directionX, float directionY, float damage, Map* map, sf::Color color, float size)
+		: Entity(x, y, size, size, color) {
 
 		this->directionX = directionX;
 		this->directionY = directionY;
 		this->damage = damage;
 		this->map = map;
-		this->width = width;
-		this->height = height;
+		this->size = size;
 	}
 
 	void Bullet::update(float deltaTime) {
 
 		if (hitWall)
-
 			return;
 
+	
 		float moveX = directionX * speed * deltaTime;
 		float moveY = directionY * speed * deltaTime;
 
-		if (map != nullptr && map->isWallArea(getPosition().x + moveX, getPosition().y + moveY, width, height)) {
+		float nextX = getPosition().x + moveX;
+		float nextY = getPosition().y + moveY;
+
+		
+		if (map != nullptr && map->isWallArea(nextX, nextY, size, size)) {
+
 			hitWall = true;
 			return;
 		}

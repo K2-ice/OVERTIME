@@ -67,8 +67,9 @@ namespace EngineL
 			getPosition().x, getPosition().y,
 			dx, dy,
 			GetStats().damage,
+			map,
 			sf::Color::Magenta,
-			24.f, 24.f, map);
+			24.f);
 
 		return { bigBullet };
 	}

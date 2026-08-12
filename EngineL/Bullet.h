@@ -7,8 +7,8 @@ namespace EngineL {
 
 	public:
 
-		Bullet(float x, float y, float directionX, float directionY, float damage,
-			sf::Color color = sf::Color::Yellow, float width = 8.f, float height = 8.f, Map* map = nullptr);
+		Bullet(float x, float y, float directionX, float directionY, float damage, Map* map,
+			sf::Color color = sf::Color::Yellow, float size = 8.f);
 
 		void update(float deltaTime) override;
 		float getDamage() const;
@@ -21,8 +21,7 @@ namespace EngineL {
 
 		float speed = 600.f;
 		float damage;
-		float width;
-		float height;
+		float size;
 		bool hitWall = false;
 		Map* map;
 	};

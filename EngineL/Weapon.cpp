@@ -67,7 +67,7 @@ namespace EngineL
 		currentAmmo--;
 
 		if (pelletCount <= 1) {
-			bullets.push_back(new Bullet(x, y, dirX, dirY, damage + damageBonus));
+			bullets.push_back(new Bullet(x, y, dirX, dirY, damage + damageBonus, map));
 		}
 
 		else {
@@ -84,7 +84,7 @@ namespace EngineL
 				float pelletDirX = std::cos(angle);
 				float pelletDirY = std::sin(angle);
 
-				bullets.push_back(new Bullet(x, y, pelletDirX, pelletDirY, damage + damageBonus));
+				bullets.push_back(new Bullet(x, y, pelletDirX, pelletDirY, damage + damageBonus, map));
 			}
 		}
 
