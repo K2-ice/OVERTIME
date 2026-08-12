@@ -16,7 +16,7 @@ public:
 	SettingsScreen(sf::Font& font);
 	SettingsAction handleInput(EngineL::InputManager& input, const sf::RenderWindow& window);
 
-	void render(sf::RenderWindow& window);
+	void render(sf::RenderWindow& window, const EngineL::InputManager& input);
 	int getVolume() const;
 
 private:

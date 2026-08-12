@@ -93,4 +93,8 @@ namespace EngineL {
 	KeyLayout InputManager::getKeyLayout() const {
 		return keyLayout;
 	}
+
+	void InputManager::toggleKeyLayout() {
+		keyLayout = (keyLayout == KeyLayout::AZERTY) ? KeyLayout::QWERTY : KeyLayout::AZERTY;
+	}
 }

@@ -9,9 +9,10 @@ namespace EngineL {
 	};
 
 	class InputManager {
-	public:
-		void update(const sf::RenderWindow& window);
 
+	public:
+
+		void update(const sf::RenderWindow& window);
 		bool isKeyPressed(sf::Keyboard::Key key) const;
 		bool isKeyJustPressed(sf::Keyboard::Key key) const;
 
@@ -29,6 +30,7 @@ namespace EngineL {
 
 		void setKeyLayout(KeyLayout layout);
 		KeyLayout getKeyLayout() const;
+		void toggleKeyLayout();
 
 		float getMouseWheelDelta() const;
 		void beginFrame();

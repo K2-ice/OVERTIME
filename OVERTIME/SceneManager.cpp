@@ -134,24 +134,23 @@ bool SceneManager::updateMenus(EngineL::InputManager& input, const sf::RenderWin
 
 void SceneManager::renderCurrentMenu(sf::RenderWindow& window, EngineL::InputManager& input, EngineL::Player& player, float survivedTime)
 {
-	if (state == GameState::MainMenu)
-	{
+	if (state == GameState::MainMenu)	{
 		mainMenuScreen.render(window);
 	}
-	else if (state == GameState::Settings)
-	{
-		settingsScreen.render(window);
+
+	else if (state == GameState::Settings)	{
+		settingsScreen.render(window, input);
 	}
-	else if (state == GameState::SkillTree)
-	{
+
+	else if (state == GameState::SkillTree)	{
 		skillTreeScreen.render(window, player);
 	}
-	else if (state == GameState::Paused)
-	{
+
+	else if (state == GameState::Paused)	{
 		pauseScreen.render(window);
 	}
-	else if (state == GameState::GameOver)
-	{
+
+	else if (state == GameState::GameOver)	{
 		gameOverScreen.render(window, survivedTime);
 	}
 }
